@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link href="{{url_for('static', filename='input.css')}}" rel="stylesheet" />
+    <script src="{{url_for('static', filename='scripts.js')}}"></script>
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+  </head>
+
+  <body class="bg-gray-100 max-h-screen grid grid-rows-12 grid-cols-3">
+    <div class="flex bg-white col-span-5 row-start-1">
+      <img src="../static/images/logo.png" alt="Logo" class="w-1/6" />
+      <h1 class=""><strong></strong></h1>
+    </div>
+    <!-- Khách mời check-in -->
+    <div
+      id="check-in-in4"
+      class="grid grid-rows-8 grid-cols-3 bg-white rounded-md m-5 row-span-6 row-start-2"
+    >
+      <div
+        class="xl:text-3xl lg:text-2xl md:text-xl text-lg col-span-3 text-center self-center p-3"
+      >
+        <strong>Check-in khách hàng</strong>
+      </div>
+      <div
+        id="guest-image"
+        class="row-span-7 self-center pl-5"
+        style="display: none"
+      ></div>
+      <div
+        id="guest-checkin"
+        class="xl:text-2xl lg:text-xl md:text-lg text-sm row-span-7 col-span-2 self-center text-left pl-15 pr-5 display-none"
+        style="display: none"
+      ></div>
+    </div>
+    <!-- Số lượng khách mời đã check-in -->
+    <div
+      class="bg-white rounded-md mx-5 mb-5 row-start-8 row-span-5 text-center"
+    >
+      <div class="xl:text-3xl lg:text-2xl md:text-xl text-lg p-3">
+        <strong>Khách mời tham dự</strong>
+      </div>
+      <div id="member-of-guests" class="text-8xl self-center mt-14"></div>
+    </div>
+    <!-- Danh sách khách mời -->
+    <div
+      class="bg-white rounded-md mr-5 my-5 row-start-2 col-span-2 row-span-full flex flex-col"
+    >
+      <div class="xl:text-3xl lg:text-2xl md:text-xl text-lg p-3 text-center">
+        <strong>Danh sách khách mời</strong>
+      </div>
+      <div class="relative flex-grow overflow-x-auto sm:rounded-lg">
+        <table class="w-full text-sm text-left text-gray-500">
+          <thead class="text-xs text-black uppercase bg-[#ced6e0]">
+            <tr>
+              <th scope="col" class="px-6 py-3">STT</th>
+              <th scope="col" class="px-6 py-3">QR Code</th>
+              <th scope="col" class="px-6 py-3">Họ tên</th>
+              <th scope="col" class="px-6 py-3">Tuổi</th>
+              <th scope="col" class="px-6 py-3">Công ty</th>
+              <th scope="col" class="px-6 py-3">Vị trí</th>
+              <th scope="col" class="px-6 py-3">Trạng thái</th>
+            </tr>
+          </thead>
+          <tbody id="tbody-guests"></tbody>
+        </table>
+      </div>
+      <div id="pagination-guests" class="my-2 mx-4"></div>
+    </div>
+  </body>
+</html>
