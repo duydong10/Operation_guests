@@ -16,8 +16,9 @@ load_dotenv(find_dotenv("config.env"))
 # init MongoDB
 clientMongoDB = MongoClient(os.getenv("MONGO_URI"))
 db = clientMongoDB[os.getenv("DB_NAME")]
-collection_information = db[os.getenv("COLLECTION_INFORMATION")]
+collection_guests = db[os.getenv("COLLECTION_GUESTS")]
 collection_pool = db[os.getenv("COLLECTION_POOL")]
+collection_award = db[os.getenv("COLLECTION_AWARD")]
 
 # init minIO
 clientMinIO = Minio(
@@ -30,9 +31,10 @@ bucket_name = os.getenv("MINIO_BUCKETNAME")
 
 # global variable
 data_pool = list(collection_pool.find({}, {"_id": 0}))
-data_guests = list(collection_information.find({"prize": None}, {"_id": 0}))
-number_of_guests = collection_information.count_documents({})
-guests_true = collection_information.count_documents({"status": True})
+data_guests = list(collection_guests.find({}, {"_id": 0}))
+data_award = list(collection_award.find({}, {"_id": 0}))
+number_of_guests = collection_guests.count_documents({})
+guests_true = collection_guests.count_documents({"status": True})
 last_guest = {}
 count = [0, 0, 0]
 
@@ -49,14 +51,14 @@ def listen_to_changes():
         {"$match": {"operationType": "update"}},
     ]
     try:
-        with collection_information.watch(pipeline=pipeline) as stream:
+        with collection_guests.watch(pipeline=pipeline) as stream:
             for change in stream:
                 print("Có thay đổi trong collection:", change["updateDescription"])
-                data_pool = list(collection_pool.find({"prize": None}, {"_id": 0}))
-                data_guests = list(collection_information.find({}, {"_id": 0}))
-                number_of_guests = collection_information.count_documents({})
-                guests_true = collection_information.count_documents({"status": True})
-                last_guest = collection_information.find_one(
+                data_pool = list(collection_pool.find({}, {"_id": 0}))
+                data_guests = list(collection_guests.find({}, {"_id": 0}))
+                number_of_guests = collection_guests.count_documents({})
+                guests_true = collection_guests.count_documents({"status": True})
+                last_guest = collection_guests.find_one(
                     {"image": change["updateDescription"]["updatedFields"]["image"]},
                     {"_id": 0},
                 )
@@ -71,7 +73,7 @@ def stream_guests():
         while True:
             try:
                 # Lấy số lượng hoặc timestamp mới nhất làm điều kiện thay đổi
-                guests = list(collection_information.find({}, {"_id": 0}))
+                guests = list(collection_guests.find({}, {"_id": 0}))
                 current_data = str(guests)
 
                 if current_data != last_data:
@@ -94,6 +96,26 @@ def get_guests():
     global data_guests
     try:
         return jsonify(data_guests)
+    except Exception as e:
+        return jsonify({"message": f"Lỗi: {e}"}), 500
+
+
+# api tra ve danh sach quay thuong
+@app.route("/api/get_pool", methods=["GET"])
+def get_pool():
+    global data_pool
+    try:
+        return jsonify(data_pool)
+    except Exception as e:
+        return jsonify({"message": f"Lỗi: {e}"}), 500
+
+
+# api tra ve danh sach giai thuong
+@app.route("/api/get_award", methods=["GET"])
+def get_award():
+    global data_award
+    try:
+        return jsonify(data_award)
     except Exception as e:
         return jsonify({"message": f"Lỗi: {e}"}), 500
 
@@ -121,16 +143,6 @@ def get_last_guest():
         return jsonify({"message": f"Lỗi: {e}"}), 500
 
 
-# api tra ve danh sach quay thuong
-@app.route("/api/get_pool", methods=["GET"])
-def get_pool():
-    global data_pool
-    try:
-        return jsonify(data_pool)
-    except Exception as e:
-        return jsonify({"message": f"Lỗi: {e}"}), 500
-
-
 # api random quay so
 @app.route("/api/wheel_prize", methods=["POST"])
 def wheel_prize():
@@ -149,7 +161,7 @@ def wheel_prize():
                         {"qrcode": chosen["qrcode"]},
                         {"$set": {"prize": "First Prize"}},
                     )
-                    winner = collection_information.find_one(
+                    winner = collection_guests.find_one(
                         {"qrcode": chosen["qrcode"]}, {"_id": 0}
                     )
                     return jsonify(winner), 200
@@ -164,7 +176,7 @@ def wheel_prize():
                         {"qrcode": chosen["qrcode"]},
                         {"$set": {"prize": "Second Prize"}},
                     )
-                    winner = collection_information.find_one(
+                    winner = collection_guests.find_one(
                         {"qrcode": chosen["qrcode"]}, {"_id": 0}
                     )
                     return jsonify(winner), 200
@@ -179,7 +191,7 @@ def wheel_prize():
                         {"qrcode": chosen["qrcode"]},
                         {"$set": {"prize": "Third Prize"}},
                     )
-                    winner = collection_information.find_one(
+                    winner = collection_guests.find_one(
                         {"qrcode": chosen["qrcode"]}, {"_id": 0}
                     )
                     return jsonify(winner), 200
@@ -196,21 +208,21 @@ def wheel_prize():
 def update_guest():
     try:
         data = request.get_json()
-        check = collection_information.find_one(
+        check = collection_guests.find_one(
             {"qrcode": data["qrcode"]}, {"status": 1}
         )
         if check["status"] == True:
             return jsonify({"message": "Khách đã check-in!"}), 400
         else:
-            result = collection_information.update_one(
+            result = collection_guests.update_one(
                 {"qrcode": data["qrcode"]},
                 {"$set": {"status": True}},
             )
-            check_wheel = collection_pool.find_one(
+            check_pool = collection_pool.find_one(
                 {"qrcode": data["qrcode"]}, {"_id": 0}
             )
-            if not check_wheel:
-                collection_pool.insert_one({"qrcode": data["qrcode"], "prize": None})
+            if not check_pool:
+                collection_pool.insert_one({"qrcode": data["qrcode"], "id_award": None})
         if result.matched_count == 0:
             return jsonify({"message": "Không tìm thấy khách hàng!"}), 404
         return jsonify({"message": "Check-in thành công!"}), 200

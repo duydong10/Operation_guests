@@ -4,7 +4,6 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home</title>
-    <link href="{{url_for('static', filename='input.css')}}" rel="stylesheet" />
     <script src="{{url_for('static', filename='scripts.js')}}"></script>
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css"
@@ -14,11 +13,63 @@
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
   </head>
 
-  <body class="bg-gray-100 max-h-screen grid grid-rows-12 grid-cols-3">
-    <div class="flex bg-white col-span-5 row-start-1">
-      <img src="../static/images/logo.png" alt="Logo" class="w-1/6" />
-      <h1 class=""><strong></strong></h1>
-    </div>
+  <body class="bg-gray-100 min-h-screen grid grid-rows-12 grid-cols-3 h-xs">
+    <nav class="bg-white min-h-fit border-gray-200 col-span-3 row-start-1">
+      <div class="w-auto flex items-center justify-between px-6">
+        <a
+          href="https://tanhungha.com.vn/"
+          class="flex items-center w-xs py-1.5"
+        >
+          <img src="../static/images/logo.png" alt="Logo" />
+        </a>
+        <button
+          data-collapse-toggle="navbar-default"
+          type="button"
+          class="z-50 inline-flex items-center fixed p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
+          aria-controls="navbar-default"
+          aria-expanded="false"
+        >
+          <span class="sr-only">Open main menu</span>
+          <svg
+            class="w-5 h-5"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 17 14"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M1 1h15M1 7h15M1 13h15"
+            />
+          </svg>
+        </button>
+        <div class="hidden w-full md:block md:w-auto z-50" id="navbar-default">
+          <ul
+            class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white"
+          >
+            <li>
+              <a
+                href="#"
+                class="block py-2 px-3 text-white bg-blue-700 rounded-sm md:bg-transparent md:text-blue-700 md:p-0"
+                aria-current="page"
+                >Home</a
+              >
+            </li>
+            <li>
+              <a
+                href="#"
+                class="py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0"
+                >Wheel</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
     <!-- Khách mời check-in -->
     <div
       id="check-in-in4"
@@ -47,7 +98,7 @@
       <div class="xl:text-3xl lg:text-2xl md:text-xl text-lg p-3">
         <strong>Khách mời tham dự</strong>
       </div>
-      <div id="member-of-guests" class="text-8xl self-center mt-14"></div>
+      <div id="number-of-guests" class="text-8xl self-center mt-14"></div>
     </div>
     <!-- Danh sách khách mời -->
     <div
@@ -61,11 +112,9 @@
           <thead class="text-xs text-black uppercase bg-[#ced6e0]">
             <tr>
               <th scope="col" class="px-6 py-3">STT</th>
-              <th scope="col" class="px-6 py-3">QR Code</th>
               <th scope="col" class="px-6 py-3">Họ tên</th>
               <th scope="col" class="px-6 py-3">Tuổi</th>
               <th scope="col" class="px-6 py-3">Công ty</th>
-              <th scope="col" class="px-6 py-3">Vị trí</th>
               <th scope="col" class="px-6 py-3">Trạng thái</th>
             </tr>
           </thead>

@@ -2,7 +2,7 @@ let guestsData = [];
 let currentPage = 1;
 const rowsPerPage = 12;
 
-function updateQuestCheckin() {
+function updateGuestCheckin() {
   fetch("/api/get_last_guest")
     .then((res) => res.json())
     .then((res) => {
@@ -37,8 +37,8 @@ function updateGuestCount() {
   fetch("/api/get_count_guests")
     .then((res) => res.json())
     .then((res) => {
-      if (res.count) {
-        document.getElementById("member-of-guests").innerHTML = `
+      if (res.number_of_guests) {
+        document.getElementById("number-of-guests").innerHTML = `
           <strong>${res.count}/${res.number_of_guests}</strong>
         `;
       } else {
@@ -74,11 +74,9 @@ function renderGuestTable() {
     row.className = "odd:bg-white even:bg-gray-50 border-b border-gray-200";
     row.innerHTML = `
       <td class="px-6 py-4">${start + index + 1}</td>
-      <td class="px-6 py-4">${guest.qrcode}</td>
       <td class="px-6 py-4">${guest.data.name}</td>
       <td class="px-6 py-4">${guest.data.age}</td>
       <td class="px-6 py-4">${guest.data.company}</td>
-      <td class="px-6 py-4">${guest.data.position}</td>
       <td class="px-6 py-4 ${
         guest.status ? "text-green-500" : "text-red-500"
       }">${guest.status ? "Đã check-in" : "Chưa check-in"}</td>
@@ -157,7 +155,7 @@ window.addEventListener("DOMContentLoaded", function () {
     // Khi có thay đổi thì gọi lại function
     updateGuestCount();
     updateGuestData();
-    updateQuestCheckin();
+    updateGuestCheckin();
   };
 
   evtSource.onerror = function (err) {
