@@ -13,26 +13,26 @@
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
   </head>
 
-  <body class="bg-gray-100 min-h-screen grid grid-rows-12 grid-cols-3 h-xs">
-    <nav class="bg-white min-h-fit border-gray-200 col-span-3 row-start-1">
+  <body class="font-sans bg-gray-100 min-h-screen grid grid-rows-12 grid-cols-10 h-20">
+    <nav class="bg-white border-gray-200 col-span-10 row-start-1">
       <div class="w-auto flex items-center justify-between px-6">
-        <a
-          href="https://tanhungha.com.vn/"
-          class="flex items-center w-xs py-1.5"
-        >
+        <a href="https://tanhungha.com.vn/" class="w-xs py-1.5">
           <img src="../static/images/logo.png" alt="Logo" />
         </a>
+        <div>
+          <strong class="text-3xl text-blue-800 text-center"
+            >THÔNG TIN CHECK-IN KHÁCH HÀNG</strong
+          >
+        </div>
         <button
-          data-collapse-toggle="navbar-default"
+          id="dropdownNavbarLink"
+          data-dropdown-toggle="dropdownNavbar"
           type="button"
-          class="z-50 inline-flex items-center fixed p-2 w-10 h-10 justify-center text-sm text-gray-500 rounded-lg md:hidden hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
-          aria-controls="navbar-default"
-          aria-expanded="false"
+          class="inline-flex items-center justify-self-end p-2 w-10 h-10 text-sm text-gray-500 rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200"
         >
-          <span class="sr-only">Open main menu</span>
           <svg
             class="w-5 h-5"
-            aria-hidden="true"
+            aria-hidden="false"
             xmlns="http://www.w3.org/2000/svg"
             fill="none"
             viewBox="0 0 17 14"
@@ -46,23 +46,26 @@
             />
           </svg>
         </button>
-        <div class="hidden w-full md:block md:w-auto z-50" id="navbar-default">
+        <div
+          id="dropdownNavbar"
+          class="z-10 hidden font-normal w-40"
+        >
           <ul
-            class="font-medium flex flex-col p-4 md:p-0 mt-4 border border-gray-100 rounded-lg bg-gray-50 md:flex-row md:space-x-8 md:mt-0 md:border-0 md:bg-white"
+            class="py-2 text-lg text-blue-800 font-semibold bg-white rounded-lg shadow-xl mr-7"
+            aria-labelledby="dropdownLargeButton"
           >
-            <li>
+            <li class="group">
               <a
                 href="#"
-                class="block py-2 px-3 text-white bg-blue-700 rounded-sm md:bg-transparent md:text-blue-700 md:p-0"
-                aria-current="page"
-                >Home</a
+                class="block pl-4 py-2 duration-300 hover:pl-5"
+                >Dashboard</a
               >
             </li>
             <li>
               <a
                 href="#"
-                class="py-2 px-3 text-gray-900 rounded-sm hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0"
-                >Wheel</a
+                class="block pl-4 py-2 duration-300 hover:pl-5"
+                >Settings</a
               >
             </li>
           </ul>
@@ -70,52 +73,71 @@
       </div>
     </nav>
 
-    <!-- Khách mời check-in -->
+    <!-- Khách mới check-in -->
     <div
       id="check-in-in4"
-      class="grid grid-rows-8 grid-cols-3 bg-white rounded-md m-5 row-span-6 row-start-2"
+      class="grid grid-rows-8 grid-cols-3 bg-white rounded-md mx-5 mb-5 row-span-7 row-start-6 col-span-5"
     >
       <div
-        class="xl:text-3xl lg:text-2xl md:text-xl text-lg col-span-3 text-center self-center p-3"
+        class="2xl:text-3xl xl:text-2xl lg:text-xl md:text-lg text-xs col-span-3 text-center self-center p-3"
       >
-        <strong>Check-in khách hàng</strong>
+        <strong class="text-blue-800">Check-in thông tin khách mời</strong>
+      </div>
+      <div id="guest-image" class="row-span-7 self-center pl-10">
+        <img
+          src="../static/images/portrait-placeholder.jpg"
+          class="border border-none rounded-full min-w-full aspect-square"
+        />
       </div>
       <div
-        id="guest-image"
-        class="row-span-7 self-center pl-5"
-        style="display: none"
-      ></div>
-      <div
         id="guest-checkin"
-        class="xl:text-2xl lg:text-xl md:text-lg text-sm row-span-7 col-span-2 self-center text-left pl-15 pr-5 display-none"
-        style="display: none"
-      ></div>
+        class="xl:text-2xl lg:text-xl md:text-lg text-sm self-center row-span-7 col-span-2 text-left pl-20 pr-10"
+      >
+        <p class="text-gray-400 text-center">No Information</p>
+      </div>
     </div>
+
     <!-- Số lượng khách mời đã check-in -->
     <div
-      class="bg-white rounded-md mx-5 mb-5 row-start-8 row-span-5 text-center"
+      class="bg-white rounded-md m-5 row-start-2 row-span-4 col-span-2 text-center"
     >
-      <div class="xl:text-3xl lg:text-2xl md:text-xl text-lg p-3">
-        <strong>Khách mời tham dự</strong>
+      <div class="2xl:text-3xl xl:text-2xl lg:text-xl md:text-lg text-xs p-3">
+        <strong class="text-blue-800">Khách mời tham dự</strong>
       </div>
       <div id="number-of-guests" class="text-8xl self-center mt-14"></div>
     </div>
+
+    <!-- Thời gian đếm ngược -->
+    <div
+      class="bg-white rounded-md my-5 mr-5 row-start-2 row-span-4 col-span-3 text-center"
+    >
+      <div class="2xl:text-3xl xl:text-2xl lg:text-xl md:text-lg text-xs p-3">
+        <strong class="text-blue-800">Thời gian đếm ngược</strong>
+      </div>
+      <div id="countdown" class="text-5xl self-center mt-20"></div>
+    </div>
+
     <!-- Danh sách khách mời -->
     <div
-      class="bg-white rounded-md mr-5 my-5 row-start-2 col-span-2 row-span-full flex flex-col"
+      class="bg-white rounded-md mr-5 my-5 row-start-2 col-span-5 row-span-full flex flex-col"
     >
-      <div class="xl:text-3xl lg:text-2xl md:text-xl text-lg p-3 text-center">
-        <strong>Danh sách khách mời</strong>
+      <div
+        class="2xl:text-3xl xl:text-2xl lg:text-xl md:text-lg text-xs p-3 text-center"
+      >
+        <strong class="text-blue-800">Danh sách khách mời</strong>
       </div>
-      <div class="relative flex-grow overflow-x-auto sm:rounded-lg">
-        <table class="w-full text-sm text-left text-gray-500">
+      <div
+        id="divtable"
+        class="relative flex-grow overflow-x-auto sm:rounded-lg"
+      >
+        <table class="w-full table-fixed text-sm text-left text-gray-500">
           <thead class="text-xs text-black uppercase bg-[#ced6e0]">
             <tr>
-              <th scope="col" class="px-6 py-3">STT</th>
-              <th scope="col" class="px-6 py-3">Họ tên</th>
-              <th scope="col" class="px-6 py-3">Tuổi</th>
-              <th scope="col" class="px-6 py-3">Công ty</th>
-              <th scope="col" class="px-6 py-3">Trạng thái</th>
+              <th scope="col" class="px-6 py-3 w-1/12 h-10">STT</th>
+              <th scope="col" class="px-6 py-3 w-1/3 h-10">Họ tên</th>
+              <th scope="col" class="px-6 py-3 w-1/12 h-10">Tuổi</th>
+              <th scope="col" class="px-6 py-3 w-1/4 h-10">Công ty</th>
+              <th scope="col" class="px-6 py-3 w-1/4 h-10">Trạng thái</th>
             </tr>
           </thead>
           <tbody id="tbody-guests"></tbody>

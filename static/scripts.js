@@ -1,28 +1,35 @@
 let guestsData = [];
-let currentPage = 1;
-const rowsPerPage = 12;
+const startTime = {
+  hours: 20,
+  minutes: 0,
+  seconds: 0,
+};
 
 function updateGuestCheckin() {
   fetch("/api/get_last_guest")
     .then((res) => res.json())
     .then((res) => {
-      if (res) {
+      if (res.data) {
         document.getElementById("guest-image").innerHTML = `
-        <img src="${res.url}" alt="Guest"/>
+        <img src="${res.url}" class="border border-none rounded-full min-w-full aspect-square" alt="Guest"/>
         `;
         document.getElementById("guest-checkin").innerHTML = `
-        <ul>
-          <li><strong>Họ tên: </strong>${res.data.name}</li>
-          <li><strong>Tuổi: </strong>${res.data.age}</li>
-          <li><strong>Đơn vị: </strong>${res.data.company}</li>
-          <li><strong>Vị trí: </strong>${res.data.position}</li>
+        <ul class="pl-10">
+          <li class="mb-2"><p><strong>Họ tên: </strong>${res.data.name}</p></li>
+          <li class="mb-2"><p><strong>Tuổi: </strong>${res.data.age}</p></li>
+          <li class="mb-2"><p><strong>Đơn vị: </strong>${res.data.company}</p></li>
+          <li class="mb-2"><p><strong>Vị trí: </strong>${res.data.position}</p></li>
         </ul>
         `;
         document.getElementById("guest-image").style.display = "inline";
         document.getElementById("guest-checkin").style.display = "inline";
         setTimeout(() => {
-          document.getElementById("guest-image").style.display = "none";
-          document.getElementById("guest-checkin").style.display = "none";
+          document.getElementById("guest-image").innerHTML = `
+          <img
+          src="../static/images/portrait-placeholder.jpg" class="border border-none rounded-full min-w-full aspect-square"
+          />`;
+          document.getElementById("guest-checkin").innerHTML = `
+          <p class="text-gray-400 text-center">No Information</p>`;
         }, 5000);
       } else {
         console.warn(res.message || "Không có dữ liệu.");
@@ -39,7 +46,7 @@ function updateGuestCount() {
     .then((res) => {
       if (res.number_of_guests) {
         document.getElementById("number-of-guests").innerHTML = `
-          <strong>${res.count}/${res.number_of_guests}</strong>
+          <strong>${res.count}</strong>
         `;
       } else {
         console.warn(res.message || "Không có dữ liệu.");
@@ -48,6 +55,36 @@ function updateGuestCount() {
     .catch((err) => {
       console.error("Lỗi:", err);
     });
+}
+
+function countdown() {
+  const today = new Date();
+
+  let diffHours = startTime.hours - today.getHours();
+  let diffMinutes = startTime.minutes - today.getMinutes();
+  let diffSeconds = startTime.seconds - today.getSeconds();
+
+  if (diffSeconds < 0) {
+    diffSeconds += 60;
+    diffMinutes--;
+  }
+
+  if (diffMinutes < 0) {
+    diffMinutes += 60;
+    diffHours--;
+  }
+
+  if (diffHours < 0) {
+    diffHours = diffMinutes = diffSeconds = 0;
+  }
+
+  const hours = String(diffHours).padStart(2, "0");
+  const minutes = String(diffMinutes).padStart(2, "0");
+  const seconds = String(diffSeconds).padStart(2, "0");
+
+  document.getElementById(
+    "countdown"
+  ).innerHTML = `${hours}:${minutes}:${seconds}`;
 }
 
 function updateGuestData() {
@@ -141,18 +178,60 @@ function renderPagination() {
   });
 }
 
+let currentPage = 1;
+let rowsPerPage = 13;
+
 window.addEventListener("DOMContentLoaded", function () {
-  // Gọi ban đầu
+  const tbody = document.getElementById("tbody-guests");
+  function calculateRowsPerPage() {
+    const headerHeight = 80;
+    const theadHeight = 40;
+    const titleHeight = 56;
+
+    const tbody = document.getElementById("tbody-guests");
+    const rowSample = tbody ? tbody.querySelector("tr") : null;
+
+    let rowHeight = 53; // fallback mặc định
+    if (rowSample) {
+      rowHeight = rowSample.offsetHeight || 53;
+    }
+
+    const height = window.innerHeight;
+    const newRows = Math.floor(
+      (height - headerHeight - theadHeight - titleHeight - 104) / rowHeight
+    );
+
+    if (newRows !== rowsPerPage && newRows > 0) {
+      rowsPerPage = newRows;
+      console.log("Cập nhật rowsPerPage:", rowsPerPage);
+      renderGuestTable();
+      renderPagination();
+    }
+  }
+
+  // Tính lần đầu
+  calculateRowsPerPage();
+
+  // Gọi các hàm khởi tạo ban đầu
   updateGuestCount();
   updateGuestData();
 
-  // Lắng nghe từ server
+  countdown();
+  setInterval(countdown, 1000);
+
+  // Quan sát thay đổi kích thước divtable
+
+  if (tbody) {
+    const resizeObserver = new ResizeObserver(() => {
+      calculateRowsPerPage();
+    });
+    resizeObserver.observe(tbody);
+  }
+
+  // Lắng nghe từ server (SSE)
   const evtSource = new EventSource("/guests/stream");
 
-  evtSource.onmessage = function (event) {
-    console.log("Nhận dữ liệu SSE:", event.data);
-
-    // Khi có thay đổi thì gọi lại function
+  evtSource.onmessage = function () {
     updateGuestCount();
     updateGuestData();
     updateGuestCheckin();
@@ -160,6 +239,5 @@ window.addEventListener("DOMContentLoaded", function () {
 
   evtSource.onerror = function (err) {
     console.error("SSE lỗi:", err);
-    // Có thể thử reconnect nếu cần
   };
 });
