@@ -1,7 +1,11 @@
-import { fetchLastGuest, fetchGuestCount, fetchGuests } from './api.js';
-import { showGuestInfo, showGuestCount, renderGuestTable } from './ui.js';
-import { renderPagination } from './pagination.js';
-import { countdown } from './countdown.js';
+import {
+  fetchGetLastGuest,
+  fetchGetGuestCount,
+  fetchGetGuests,
+} from "./api.js";
+import { showGuestInfo, showGuestCount, renderGuestTable } from "./ui.js";
+import { renderPagination } from "./pagination.js";
+import { initCountdown } from "./countdown.js";
 
 let guestsData = [];
 let currentPage = 1;
@@ -9,7 +13,7 @@ let rowsPerPage = 13;
 
 async function updateGuestCheckin() {
   try {
-    const res = await fetchLastGuest();
+    const res = await fetchGetLastGuest();
     if (res.data) {
       showGuestInfo(res.data, res.url);
     } else {
@@ -22,7 +26,7 @@ async function updateGuestCheckin() {
 
 async function updateGuestCount() {
   try {
-    const res = await fetchGuestCount();
+    const res = await fetchGetGuestCount();
     if (res.number_of_guests) {
       showGuestCount(res.count);
     } else {
@@ -35,7 +39,7 @@ async function updateGuestCount() {
 
 async function updateGuestData() {
   try {
-    const res = await fetchGuests();
+    const res = await fetchGetGuests();
     guestsData = res.sort((a, b) => a.data.name.localeCompare(b.data.name));
     renderGuestTable(guestsData, currentPage, rowsPerPage);
     renderPagination(guestsData, currentPage, rowsPerPage, changePage);
@@ -63,7 +67,9 @@ function calculateRowsPerPage() {
   }
 
   const height = window.innerHeight;
-  const newRows = Math.floor((height - headerHeight - theadHeight - titleHeight - 104) / rowHeight);
+  const newRows = Math.floor(
+    (height - headerHeight - theadHeight - titleHeight - 104) / rowHeight
+  );
 
   if (newRows !== rowsPerPage && newRows > 0) {
     rowsPerPage = newRows;
@@ -80,9 +86,6 @@ window.addEventListener("DOMContentLoaded", function () {
   updateGuestCount();
   updateGuestData();
 
-  countdown();
-  setInterval(countdown, 1000);
-
   if (tbody) {
     const resizeObserver = new ResizeObserver(() => {
       calculateRowsPerPage();
@@ -96,6 +99,7 @@ window.addEventListener("DOMContentLoaded", function () {
     updateGuestData();
     updateGuestCheckin();
   };
+  initCountdown();
   evtSource.onerror = function (err) {
     console.error("SSE lỗi:", err);
   };

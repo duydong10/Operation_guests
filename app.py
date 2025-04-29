@@ -9,7 +9,7 @@ from flask import Response, stream_with_context
 import time
 from minio import Minio
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder="static")
 CORS(app)
 load_dotenv(find_dotenv("config.env"))
 
@@ -237,7 +237,6 @@ def update_guest():
     try:
         data = request.get_json()
         check = collection_guests.find_one({"qrcode": data["qrcode"]}, {"status": 1})
-        check_img = collection_guests.count_documents({"image": data["image"]})
         if check["status"] == True:
             return jsonify({"message": "Khách đã check-in trước đó!"}), 400
         else:
@@ -253,8 +252,6 @@ def update_guest():
                 collection_pool.insert_one(
                     {"qrcode": data["qrcode"], "id_award": None, "timestamp": None}
                 )
-            # else:
-            #     return jsonify({"message": "Hình ảnh đã dùng cho khách mời khác!"}), 404
         if result.matched_count == 0:
             return jsonify({"message": "Không tìm thấy khách mời!"}), 404
         return jsonify({"message": "Check-in thành công!"}), 200
@@ -282,6 +279,28 @@ def update_pool():
             {"$set": {"id_award": data["id_award"], "timestamp": data["timestamp"]}},
         )
         return jsonify({"message": "Thành công!"}), 200
+    except Exception as e:
+        return jsonify({"message": f"Lỗi: {e}"}), 500
+
+
+starttime = {"hours": 20, "minutes": 0, "seconds": 0}
+
+
+@app.route("/api/set_starttime", methods=["POST"])
+def set_starttime():
+    global starttime
+    try:
+        starttime = request.get_json()
+        return jsonify({"message": "Thành công!"}), 200
+    except Exception as e:
+        return jsonify({"message": f"Lỗi: {e}"}), 500
+
+
+@app.route("/api/get_starttime", methods=["GET"])
+def get_starttime():
+    global starttime
+    try:
+        return jsonify(starttime), 200
     except Exception as e:
         return jsonify({"message": f"Lỗi: {e}"}), 500
 

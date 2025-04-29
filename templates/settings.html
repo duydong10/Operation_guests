@@ -3,8 +3,8 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Settings</title>
-    <script type="module" src="{{url_for('static', filename='js/main.js')}}"></script>
+    <title>Settings | THH 10th Anniversary</title>
+    <script type="module" src="{{url_for('static', filename='js/settings.js')}}"></script>
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css"
       rel="stylesheet"
@@ -83,10 +83,16 @@
         <strong class="text-blue-800">Thiết lập thời gian bắt đầu sự kiện</strong>
       </div>
       <div class="self-center text-center pt-10">
-        <form id="form-settime">
-          <input type="time" id="start-time" name="start-time" step="1" class="rounded-sm">
-          <input type="submit" value="Submit" class="rounded-sm bg-gray-500 hover:bg-gray-600 text-white px-4 py-2">
-        </form>
+        <form id="timeForm">
+          <label for="hours">Giờ: </label>
+          <input type="number" id="hours" name="hours" min="0" max="23" class="h-8 mx-2" required>
+          <label for="minutes">Phút: </label>
+          <input type="number" id="minutes" name="minutes" min="0" max="59" class="h-8 mx-2" required>
+          <label for="seconds">Giây: </label>
+          <input type="number" id="seconds" name="seconds" min="0" max="59" class="h-8 mx-2" required>
+          <br>
+          <button type="submit" class="rounded-lg bg-blue-500 hover:bg-blue-700 duration-300 shadow-lg hover:shadow-2xl text-white py-1 px-4 my-4">Xác nhận</button>
+      </form>
       </div>
   </body>
 </html>
