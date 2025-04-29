@@ -4,7 +4,7 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home</title>
-    <script src="{{url_for('static', filename='scripts.js')}}"></script>
+    <script type="module" src="{{url_for('static', filename='js/main.js')}}"></script>
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css"
       rel="stylesheet"
@@ -56,14 +56,14 @@
           >
             <li class="group">
               <a
-                href="#"
+                href="{{url_for('index')}}"
                 class="block pl-4 py-2 duration-300 hover:pl-5"
                 >Dashboard</a
               >
             </li>
             <li>
               <a
-                href="#"
+                href="{{url_for('settings')}}"
                 class="block pl-4 py-2 duration-300 hover:pl-5"
                 >Settings</a
               >

@@ -44,6 +44,11 @@ def index():
     return render_template("index.html")
 
 
+@app.route("/settings")
+def settings():
+    return render_template("settings.html")
+
+
 # change streams
 def listen_to_changes_guests():
     global data_guests, number_of_guests, guests_true, last_guest
