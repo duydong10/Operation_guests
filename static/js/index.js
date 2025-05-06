@@ -105,7 +105,7 @@ function hiddenGuestInfo() {
     el.addEventListener("click", function (e) {
       e.preventDefault();
       pcontent.innerHTML = `
-        <img src="${guest.url}" class="border border-none rounded-full min-w-full aspect-square" alt="Guest"/>
+        <img src="${guest.url}" class="border border-none rounded-full w-70 aspect-square" alt="Guest"/>
         <p class="mt-8">${guest.data.name}</p>
         <p>${guest.data.age}</p>
         <p>${guest.data.company}</p>

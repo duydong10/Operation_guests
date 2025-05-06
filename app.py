@@ -57,25 +57,25 @@ def listen_to_changes_guests():
     try:
         with collection_guests.watch(pipeline=pipeline) as stream:
             for change in stream:
-                print(
-                    "Có thay đổi trong collection guests:", change["updateDescription"]
-                )
+                print("Có thay đổi trong collection guests:", change)
+
                 data_guests = list(collection_guests.find({}, {"_id": 0}))
                 number_of_guests = collection_guests.count_documents({})
                 guests_true = collection_guests.count_documents({"status": True})
-                if "image" in change["updateDescription"]["updatedFields"]:
-                    last_guest = collection_guests.find_one(
-                        {
-                            "image": change["updateDescription"]["updatedFields"][
-                                "image"
-                            ]
-                        },
-                        {"_id": 0},
-                    )
-                else:
-                    last_guest = {}
+
+                if change["operationType"] == "update":
+                    updated_fields = change["updateDescription"]["updatedFields"]
+                    if "image" in updated_fields:
+                        last_guest = collection_guests.find_one(
+                            {"image": updated_fields["image"]}, {"_id": 0}
+                        )
+                    else:
+                        last_guest = {}
+                elif change["operationType"] == "insert":
+                    last_guest = change.get("fullDocument", {})
     except Exception as e:
         print("Lỗi khi lắng nghe guests:", e)
+
 
 
 def listen_to_changes_pool():
@@ -84,7 +84,7 @@ def listen_to_changes_pool():
     try:
         with collection_pool.watch(pipeline=pipeline) as stream:
             for change in stream:
-                print("Có thay đổi trong collection pool:", change["updateDescription"])
+                print("Có thay đổi trong collection pool:", change)
                 data_pool = list(collection_pool.find({}, {"_id": 0}))
     except Exception as e:
         print("Lỗi khi lắng nghe pool:", e)
@@ -124,7 +124,7 @@ def get_guests():
                 url = clientMinIO.presigned_get_object(bucket_name, guest["image"])
                 guest["url"] = url
             else:
-                guest["url"] = url_for('static', filename='images/guest_portrait.png')
+                guest["url"] = url_for("static", filename="images/guest_portrait.png")
         return jsonify(data_guests)
     except Exception as e:
         return jsonify({"message": f"Lỗi: {e}"}), 500
@@ -247,10 +247,15 @@ def update_guest():
         if check["status"] == True:
             return jsonify({"message": "Khách đã check-in trước đó!"}), 400
         else:
-            # if check_img == 1:
             result = collection_guests.update_one(
                 {"qrcode": data["qrcode"]},
-                {"$set": {"status": True, "image": data["image"], "timestamp": datetime.now(timezone.utc)}},
+                {
+                    "$set": {
+                        "status": True,
+                        "image": data["image"],
+                        "timestamp": datetime.now(timezone.utc),
+                    }
+                },
             )
             check_pool = collection_pool.find_one(
                 {"qrcode": data["qrcode"]}, {"_id": 0}
@@ -270,9 +275,11 @@ def update_guest():
 def insert_guest():
     try:
         data = request.get_json()
+        data["image"] = None
         data["status"] = False
+        data["timestamp"] = None
         collection_guests.insert_one(data)
-        return jsonify({"message": "Thành công!"}), 200
+        return jsonify({"message": "Thêm thành công!"}), 200
     except Exception as e:
         return jsonify({"message": f"Lỗi: {e}"}), 500
 
