@@ -40,9 +40,26 @@ async function updateGuestCount() {
 async function updateGuestData() {
   try {
     const res = await fetchGetGuests();
-    guestsData = res.sort((a, b) => a.data.name.localeCompare(b.data.name));
+    // Sắp xếp: người đã check-in có timestamp => đưa lên đầu theo timestamp giảm dần
+    const checkedIn = res
+      .filter((g) => g.status && g.timestamp)
+      .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+    // Người chưa check-in sắp theo alphabet tên
+    const notCheckedIn = res
+      .filter((g) => !g.status)
+      .sort((a, b) => {
+        const nameA = (a.data?.name || "").toLowerCase();
+        const nameB = (b.data?.name || "").toLowerCase();
+        return nameA.localeCompare(nameB);
+      });
+
+    guestsData = [...checkedIn, ...notCheckedIn];
     renderGuestTable(guestsData, currentPage, rowsPerPage);
     renderPagination(guestsData, currentPage, rowsPerPage, changePage);
+
+    setTimeout(hiddenGuestInfo, 100);
+
   } catch (err) {
     console.error("Lỗi khi lấy dữ liệu khách mời:", err);
   }
@@ -77,6 +94,26 @@ function calculateRowsPerPage() {
     renderGuestTable(guestsData, currentPage, rowsPerPage);
     renderPagination(guestsData, currentPage, rowsPerPage, changePage);
   }
+}
+
+function hiddenGuestInfo() {
+  const hc = document.getElementById("hidden-container");
+  const pcontent = document.getElementById("popup-content");
+  guestsData.forEach((guest) => {
+    const el = document.getElementById(guest.qrcode);
+    if (!el) return;
+    el.addEventListener("click", function (e) {
+      e.preventDefault();
+      pcontent.innerHTML = `
+        <img src="${guest.url}" class="border border-none rounded-full min-w-full aspect-square" alt="Guest"/>
+        <p class="mt-8">${guest.data.name}</p>
+        <p>${guest.data.age}</p>
+        <p>${guest.data.company}</p>
+        <p>${guest.data.position}</p>
+      `;
+      hc.style.display = "block";
+    });
+  });
 }
 
 window.addEventListener("DOMContentLoaded", function () {

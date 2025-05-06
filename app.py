@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, render_template, jsonify, Response
+from flask import Flask, request, render_template, jsonify, Response, url_for
 from flask_cors import CORS
 from pymongo import MongoClient
 from dotenv import load_dotenv, find_dotenv
@@ -8,6 +8,7 @@ import threading
 from flask import Response, stream_with_context
 import time
 from minio import Minio
+from datetime import datetime, timezone
 
 app = Flask(__name__, static_folder="static")
 CORS(app)
@@ -118,6 +119,12 @@ def stream_guests():
 def get_guests():
     global data_guests
     try:
+        for guest in data_guests:
+            if guest["status"]:
+                url = clientMinIO.presigned_get_object(bucket_name, guest["image"])
+                guest["url"] = url
+            else:
+                guest["url"] = url_for('static', filename='images/guest_portrait.png')
         return jsonify(data_guests)
     except Exception as e:
         return jsonify({"message": f"Lỗi: {e}"}), 500
@@ -243,7 +250,7 @@ def update_guest():
             # if check_img == 1:
             result = collection_guests.update_one(
                 {"qrcode": data["qrcode"]},
-                {"$set": {"status": True, "image": data["image"]}},
+                {"$set": {"status": True, "image": data["image"], "timestamp": datetime.now(timezone.utc)}},
             )
             check_pool = collection_pool.find_one(
                 {"qrcode": data["qrcode"]}, {"_id": 0}

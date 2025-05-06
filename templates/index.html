@@ -4,7 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Home | THH 10th Anniversary</title>
-    <script type="module" src="{{url_for('static', filename='js/index.js')}}"></script>
+    <script
+      type="module"
+      src="{{url_for('static', filename='js/index.js')}}"
+    ></script>
     <link
       href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css"
       rel="stylesheet"
@@ -13,7 +16,9 @@
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
   </head>
 
-  <body class="font-sans bg-gray-100 min-h-screen grid grid-rows-12 grid-cols-10 h-20">
+  <body
+    class="font-sans bg-gray-100 min-h-screen grid grid-rows-12 grid-cols-10 h-20"
+  >
     <nav class="bg-white border-gray-200 col-span-10 row-start-1">
       <div class="w-auto flex items-center justify-between px-6">
         <a href="https://tanhungha.com.vn/" class="w-xs py-1.5">
@@ -46,10 +51,7 @@
             />
           </svg>
         </button>
-        <div
-          id="dropdownNavbar"
-          class="z-10 hidden font-normal w-40"
-        >
+        <div id="dropdownNavbar" class="z-10 hidden font-normal w-40">
           <ul
             class="py-2 text-lg text-blue-800 font-semibold bg-white rounded-lg shadow-xl mr-7"
             aria-labelledby="dropdownLargeButton"
@@ -134,16 +136,39 @@
           <thead class="text-xs text-black uppercase bg-[#ced6e0]">
             <tr>
               <th scope="col" class="px-6 py-3 w-1/12 h-10">STT</th>
+              <th scope="col" class="px-6 py-3 w-1/6 h-10">Ảnh</th>
               <th scope="col" class="px-6 py-3 w-1/3 h-10">Họ tên</th>
               <th scope="col" class="px-6 py-3 w-1/12 h-10">Tuổi</th>
-              <th scope="col" class="px-6 py-3 w-1/4 h-10">Công ty</th>
-              <th scope="col" class="px-6 py-3 w-1/4 h-10">Trạng thái</th>
+              <th scope="col" class="px-6 py-3 w-1/6 h-10">Công ty</th>
+              <th scope="col" class="px-6 py-3 w-1/6 h-10">Trạng thái</th>
             </tr>
           </thead>
           <tbody id="tbody-guests"></tbody>
         </table>
       </div>
       <div id="pagination-guests" class="my-2 mx-4"></div>
+    </div>
+    <div id="hidden-container" style="display: none;">
+      <div
+        id="overlay"
+        class="fixed inset-0 bg-black opacity-50 z-998 flex justify-center items-center"
+      ></div>
+      <div
+        class="fixed shadow-xl rounded-xl top-1/2 left-1/2 z-999 p-5 w-80 h-120 bg-white"
+        id="hidden-popup"
+        style="transform: translate(-50%, -50%)"
+      >
+        <div id="popup-content" class="text-center text-black"><p>test</p></div>
+        <button
+          id="close-popup"
+          class="absolute top-2 right-2 bg-red-500 text-white rounded-full aspect-square min-w-full"
+          type="button"
+          data-target="#hidden-container"
+          onclick="document.getElementById('hidden-container').style.display='none'"
+        >
+          X
+        </button>
+      </div>
     </div>
   </body>
 </html>

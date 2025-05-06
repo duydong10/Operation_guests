@@ -67,11 +67,11 @@ export function set_startTime() {
 
     fetchPostStartTime(data)
       .then(() => {
-        alert("⏱️ Thời gian bắt đầu đã được cập nhật!");
+        alert("Thời gian bắt đầu đã được cập nhật!");
       })
       .catch((err) => {
         console.error("Lỗi cập nhật thời gian:", err);
-        alert("❌ Cập nhật thất bại.");
+        alert("Cập nhật thất bại.");
       });
   });
 }
