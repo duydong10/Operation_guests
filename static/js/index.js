@@ -3,7 +3,12 @@ import {
   fetchGetGuestCount,
   fetchGetGuests,
 } from "./api.js";
-import { showGuestInfo, showGuestCount, renderGuestTable } from "./ui.js";
+import {
+  showGuestInfo,
+  showGuestCount,
+  renderGuestTable,
+  hiddenGuestInfo,
+} from "./ui.js";
 import { renderPagination } from "./pagination.js";
 import { initCountdown } from "./countdown.js";
 
@@ -58,8 +63,7 @@ async function updateGuestData() {
     renderGuestTable(guestsData, currentPage, rowsPerPage);
     renderPagination(guestsData, currentPage, rowsPerPage, changePage);
 
-    setTimeout(hiddenGuestInfo, 100);
-
+    setTimeout(hiddenGuestInfo(guestsData), 100);
   } catch (err) {
     console.error("Lỗi khi lấy dữ liệu khách mời:", err);
   }
@@ -94,26 +98,6 @@ function calculateRowsPerPage() {
     renderGuestTable(guestsData, currentPage, rowsPerPage);
     renderPagination(guestsData, currentPage, rowsPerPage, changePage);
   }
-}
-
-function hiddenGuestInfo() {
-  const hc = document.getElementById("hidden-container");
-  const pcontent = document.getElementById("popup-content");
-  guestsData.forEach((guest) => {
-    const el = document.getElementById(guest.qrcode);
-    if (!el) return;
-    el.addEventListener("click", function (e) {
-      e.preventDefault();
-      pcontent.innerHTML = `
-        <img src="${guest.url}" class="border border-none rounded-full w-70 aspect-square" alt="Guest"/>
-        <p class="mt-8">${guest.data.name}</p>
-        <p>${guest.data.age}</p>
-        <p>${guest.data.company}</p>
-        <p>${guest.data.position}</p>
-      `;
-      hc.style.display = "block";
-    });
-  });
 }
 
 window.addEventListener("DOMContentLoaded", function () {

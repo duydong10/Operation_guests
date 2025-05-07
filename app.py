@@ -9,6 +9,7 @@ from flask import Response, stream_with_context
 import time
 from minio import Minio
 from datetime import datetime, timezone
+import socket
 
 app = Flask(__name__, static_folder="static")
 CORS(app)
@@ -75,7 +76,6 @@ def listen_to_changes_guests():
                     last_guest = change.get("fullDocument", {})
     except Exception as e:
         print("Lỗi khi lắng nghe guests:", e)
-
 
 
 def listen_to_changes_pool():
@@ -318,8 +318,26 @@ def get_starttime():
     except Exception as e:
         return jsonify({"message": f"Lỗi: {e}"}), 500
 
+# TCP server function
+def start_tcp_server(host='0.0.0.0', port=8090):
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
+        server_socket.bind((host, port))
+        server_socket.listen()
+        print(f"TCP server lắng nghe tại {host}:{port}")
+        while True:
+            conn, addr = server_socket.accept()
+            with conn:
+                print(f"Kết nối từ {addr}")
+                while True:
+                    data = conn.recv(1024)
+                    message = data.decode()
+                    if not data:
+                        break
+                    print("Message:", message)
+                    conn.sendall(b'OK')  # Phản hồi nếu cần
 
 if __name__ == "__main__":
     threading.Thread(target=listen_to_changes_guests, daemon=True).start()
     threading.Thread(target=listen_to_changes_pool, daemon=True).start()
+    threading.Thread(target=start_tcp_server, daemon=True).start()
     app.run(host="0.0.0.0", port=5000, debug=False)

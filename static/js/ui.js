@@ -55,3 +55,23 @@ export function renderGuestTable(guestsData, currentPage, rowsPerPage) {
     tbody.appendChild(row);
   });
 }
+
+export function hiddenGuestInfo(guestsData) {
+  const hc = document.getElementById("hidden-container");
+  const pcontent = document.getElementById("popup-content");
+  guestsData.forEach((guest) => {
+    const el = document.getElementById(guest.qrcode);
+    if (!el) return;
+    el.addEventListener("click", function (e) {
+      e.preventDefault();
+      pcontent.innerHTML = `
+        <img src="${guest.url}" class="border border-none rounded-full w-70 aspect-square" alt="Guest"/>
+        <p class="mt-8">${guest.data.name}</p>
+        <p>${guest.data.age}</p>
+        <p>${guest.data.company}</p>
+        <p>${guest.data.position}</p>
+      `;
+      hc.style.display = "block";
+    });
+  });
+}
