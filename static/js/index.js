@@ -78,9 +78,9 @@ function calculateRowsPerPage() {
   const tbody = document.getElementById("tbody-guests");
   const rowSample = tbody ? tbody.querySelector("tr") : null;
 
-  let rowHeight = 53;
+  let rowHeight = 74;
   if (rowSample) {
-    rowHeight = rowSample.offsetHeight || 53;
+    rowHeight = rowSample.offsetHeight || 74;
   }
 
   const height = window.innerHeight;
@@ -129,6 +129,8 @@ window.addEventListener("DOMContentLoaded", function () {
     });
     resizeObserver.observe(tbody);
   }
+
+  window.addEventListener("resize", calculateRowsPerPage);
 
   const evtSource = new EventSource("/guests/stream");
   evtSource.onmessage = function () {
