@@ -18,6 +18,11 @@ export async function fetchGetStartTime() {
   return await res.json();
 }
 
+export async function fetchGetRfid() {
+  const res = await fetch("/api/get_rfid", { method: "GET" });
+  return await res.json();
+}
+
 export async function fetchPostStartTime(starttime) {
   const res = await fetch("/api/set_starttime", {
     method: "POST",

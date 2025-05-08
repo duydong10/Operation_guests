@@ -10,6 +10,7 @@ import time
 from minio import Minio
 from datetime import datetime, timezone
 import socket
+import json
 
 app = Flask(__name__, static_folder="static")
 CORS(app)
@@ -177,6 +178,14 @@ def get_last_guest():
     except Exception as e:
         return jsonify({"message": f"Lỗi: {e}"}), 500
 
+#api tra ve thong tin quet rfid
+@app.route("/api/get_rfid",methods=["GET"])
+def get_rfid():
+    global tcp_data
+    try:
+        return jsonify(tcp_data), 200
+    except Exception as e:
+        return jsonify({"message": f"Lỗi: {e}"}), 500
 
 # api random quay so
 @app.route("/api/wheel_prize", methods=["POST"])
@@ -193,11 +202,11 @@ def wheel_prize():
                     data_pool.remove(chosen)
                     count[0] += 1
                     collection_pool.update_one(
-                        {"qrcode": chosen["qrcode"]},
+                        {"code": chosen["code"]},
                         {"$set": {"prize": "First Prize"}},
                     )
                     winner = collection_guests.find_one(
-                        {"qrcode": chosen["qrcode"]}, {"_id": 0}
+                        {"code": chosen["code"]}, {"_id": 0}
                     )
                     return jsonify(winner), 200
             case 2:
@@ -208,11 +217,11 @@ def wheel_prize():
                     data_pool.remove(chosen)
                     count[1] += 1
                     collection_pool.update_one(
-                        {"qrcode": chosen["qrcode"]},
+                        {"code": chosen["code"]},
                         {"$set": {"prize": "Second Prize"}},
                     )
                     winner = collection_guests.find_one(
-                        {"qrcode": chosen["qrcode"]}, {"_id": 0}
+                        {"code": chosen["code"]}, {"_id": 0}
                     )
                     return jsonify(winner), 200
             case 3:
@@ -223,11 +232,11 @@ def wheel_prize():
                     data_pool.remove(chosen)
                     count[2] += 1
                     collection_pool.update_one(
-                        {"qrcode": chosen["qrcode"]},
+                        {"code": chosen["code"]},
                         {"$set": {"prize": "Third Prize"}},
                     )
                     winner = collection_guests.find_one(
-                        {"qrcode": chosen["qrcode"]}, {"_id": 0}
+                        {"code": chosen["code"]}, {"_id": 0}
                     )
                     return jsonify(winner), 200
             case _:
@@ -243,12 +252,12 @@ def wheel_prize():
 def update_guest():
     try:
         data = request.get_json()
-        check = collection_guests.find_one({"qrcode": data["qrcode"]}, {"status": 1})
+        check = collection_guests.find_one({"code": data["code"]}, {"status": 1})
         if check["status"] == True:
             return jsonify({"message": "Khách đã check-in trước đó!"}), 400
         else:
             result = collection_guests.update_one(
-                {"qrcode": data["qrcode"]},
+                {"code": data["code"]},
                 {
                     "$set": {
                         "status": True,
@@ -257,12 +266,10 @@ def update_guest():
                     }
                 },
             )
-            check_pool = collection_pool.find_one(
-                {"qrcode": data["qrcode"]}, {"_id": 0}
-            )
+            check_pool = collection_pool.find_one({"code": data["code"]}, {"_id": 0})
             if not check_pool:
                 collection_pool.insert_one(
-                    {"qrcode": data["qrcode"], "id_award": None, "timestamp": None}
+                    {"code": data["code"], "id_award": None, "timestamp": None}
                 )
         if result.matched_count == 0:
             return jsonify({"message": "Không tìm thấy khách mời!"}), 404
@@ -289,7 +296,7 @@ def update_pool():
     try:
         data = request.get_json()
         collection_pool.update_one(
-            {"qrcode": data["qrcode"]},
+            {"code": data["code"]},
             {"$set": {"id_award": data["id_award"], "timestamp": data["timestamp"]}},
         )
         return jsonify({"message": "Thành công!"}), 200
@@ -318,26 +325,57 @@ def get_starttime():
     except Exception as e:
         return jsonify({"message": f"Lỗi: {e}"}), 500
 
+
+
+
+# TCP server configuration
+host = os.getenv("TCP_HOST")
+port = int(os.getenv("TCP_PORT"))
+tcp_data = []
+seen_tids = set()
+
 # TCP server function
-def start_tcp_server(host='0.0.0.0', port=8090):
-    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
-        server_socket.bind((host, port))
-        server_socket.listen()
-        print(f"TCP server lắng nghe tại {host}:{port}")
-        while True:
-            conn, addr = server_socket.accept()
-            with conn:
-                print(f"Kết nối từ {addr}")
+def start_tcp_client():
+    global tcp_data, seen_tids
+    decoder = json.JSONDecoder()
+    buffer = ""
+
+    while True:
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.connect((host, port))
+                s.sendall(b"OK")
+
                 while True:
-                    data = conn.recv(1024)
-                    message = data.decode()
+                    data = s.recv(1024)
                     if not data:
                         break
-                    print("Message:", message)
-                    conn.sendall(b'OK')  # Phản hồi nếu cần
+
+                    buffer += data.decode()
+
+                    while buffer:
+                        try:
+                            json_obj, idx = decoder.raw_decode(buffer)
+                            data_obj = json_obj.get("data", {})
+                            tid = data_obj.get("TID")
+
+                            if tid and tid not in seen_tids:
+                                if tid[:5] != "Error" and tid[:13] != "Not Attempted":
+                                    tcp_data.append(data_obj)
+                                    seen_tids.add(tid)
+                                    print("Thêm TID mới: ", tid)
+
+                            buffer = buffer[idx:].lstrip()
+                        except json.JSONDecodeError:
+                            break
+
+        except Exception as e:
+            print(f"Lỗi TCP client: {e}")
+            time.sleep(2)
+
 
 if __name__ == "__main__":
     threading.Thread(target=listen_to_changes_guests, daemon=True).start()
     threading.Thread(target=listen_to_changes_pool, daemon=True).start()
-    threading.Thread(target=start_tcp_server, daemon=True).start()
+    # threading.Thread(target=start_tcp_client, daemon=True).start()
     app.run(host="0.0.0.0", port=5000, debug=False)

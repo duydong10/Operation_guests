@@ -14,7 +14,7 @@ import { initCountdown } from "./countdown.js";
 
 let guestsData = [];
 let currentPage = 1;
-let rowsPerPage = 13;
+let rowsPerPage = 8;
 
 async function updateGuestCheckin() {
   try {
@@ -45,12 +45,12 @@ async function updateGuestCount() {
 async function updateGuestData() {
   try {
     const res = await fetchGetGuests();
-    // Sắp xếp: người đã check-in có timestamp => đưa lên đầu theo timestamp giảm dần
+
     const checkedIn = res
       .filter((g) => g.status && g.timestamp)
       .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-    // Người chưa check-in sắp theo alphabet tên
+
     const notCheckedIn = res
       .filter((g) => !g.status)
       .sort((a, b) => {
