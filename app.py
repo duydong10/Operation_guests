@@ -65,11 +65,12 @@ def listen_to_changes_guests():
                 number_of_guests = collection_guests.count_documents({})
                 guests_true = collection_guests.count_documents({"status": True})
 
+                updated_fields = change["updateDescription"]["updatedFields"]
                 if change["operationType"] == "update":
-                    updated_fields = change["updateDescription"]["updatedFields"]
-                    if "image" in updated_fields:
+                    
+                    if "status" in updated_fields and updated_fields["status"] == True:
                         last_guest = collection_guests.find_one(
-                            {"image": updated_fields["image"]}, {"_id": 0}
+                            {"_id": change["documentKey"]["_id"]}, {"_id": 0}
                         )
                     else:
                         last_guest = {}
@@ -115,6 +116,102 @@ def stream_guests():
     return Response(stream_with_context(event_stream()), mimetype="text/event-stream")
 
 
+# TCP server configuration
+host = os.getenv("TCP_HOST")
+port = int(os.getenv("TCP_PORT"))
+tcp_queue = []
+seen_idhexs = set()
+
+
+def hex_to_text(hex_string):
+    try:
+        return bytes.fromhex(hex_string).decode("ascii", errors="ignore")
+    except ValueError:
+        return hex_string
+
+
+# TCP server function
+def start_tcp_client():
+    global tcp_queue, seen_idhexs
+    decoder = json.JSONDecoder()
+    buffer = ""
+
+    while True:
+        try:
+            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+                s.connect((host, port))
+                s.sendall(b"OK")
+
+                while True:
+                    data = s.recv(1024)
+                    if not data:
+                        break
+
+                    buffer += data.decode()
+
+                    while buffer:
+                        try:
+                            json_obj, idx = decoder.raw_decode(buffer)
+                            data_obj = json_obj.get("data", {})
+                            idhex = data_obj.get("idHex")
+
+                            if idhex and idhex not in seen_idhexs:
+                                if (
+                                    idhex[:5] != "Error"
+                                    and idhex[:13] != "Not Attempted"
+                                    and len(idhex) == 12
+                                ):
+                                    tcp_queue.append(
+                                        {
+                                            "code": bytes.fromhex(idhex).decode(
+                                                "ascii", errors="ignore"
+                                            )
+                                        }
+                                    )
+                                    seen_idhexs.add(idhex)
+
+                            buffer = buffer[idx:].lstrip()
+                        except json.JSONDecodeError:
+                            break
+
+        except Exception as e:
+            print(f"Lỗi TCP client: {e}")
+            time.sleep(2)
+
+
+def update_status():
+    global tcp_queue
+    try:
+        while True:
+            if tcp_queue:
+                item = tcp_queue.pop(0)
+                code = item["code"]
+            else:
+                time.sleep(1)
+                continue
+
+            print(f"Đã quét mã: {code}")
+            check = collection_guests.find_one({"code": code}, {"status": 1})
+
+            if check is None:
+                print("Không tìm thấy khách mời!")
+                continue
+
+            if check["status"] == False:
+                result = collection_guests.update_one(
+                    {"code": code},
+                    {"$set": {"status": True}},
+                )
+                if result.matched_count == 0:
+                    print("Không tìm thấy khách mời khi cập nhật!")
+                else:
+                    print("Đã qua cửa!")
+            else:
+                print("Khách đã qua cửa trước đó!")
+    except Exception as e:
+        print(f"Lỗi: {e}")
+
+
 # api tra ve json du lieu khach
 @app.route("/api/get_guests", methods=["GET"])
 def get_guests():
@@ -125,7 +222,7 @@ def get_guests():
                 url = clientMinIO.presigned_get_object(bucket_name, guest["image"])
                 guest["url"] = url
             else:
-                guest["url"] = url_for("static", filename="images/guest_portrait.png")
+                guest["url"] = "../static/images/guest_portrait.png"
         return jsonify(data_guests)
     except Exception as e:
         return jsonify({"message": f"Lỗi: {e}"}), 500
@@ -178,73 +275,75 @@ def get_last_guest():
     except Exception as e:
         return jsonify({"message": f"Lỗi: {e}"}), 500
 
-#api tra ve thong tin quet rfid
-@app.route("/api/get_rfid",methods=["GET"])
+
+# api tra ve thong tin quet rfid
+@app.route("/api/get_rfid", methods=["GET"])
 def get_rfid():
-    global tcp_data
+    global tcp_queue
     try:
-        return jsonify(tcp_data), 200
+        return jsonify(tcp_queue), 200
     except Exception as e:
         return jsonify({"message": f"Lỗi: {e}"}), 500
+
 
 # api random quay so
-@app.route("/api/wheel_prize", methods=["POST"])
-def wheel_prize():
-    global data_pool, count
-    option = request.get_json()["option"]
-    try:
-        match option:
-            case 1:
-                if count[0] >= 1:
-                    return jsonify({"message": "Đã hết giải nhất!"}), 400
-                else:
-                    chosen = random.choice(data_pool)
-                    data_pool.remove(chosen)
-                    count[0] += 1
-                    collection_pool.update_one(
-                        {"code": chosen["code"]},
-                        {"$set": {"prize": "First Prize"}},
-                    )
-                    winner = collection_guests.find_one(
-                        {"code": chosen["code"]}, {"_id": 0}
-                    )
-                    return jsonify(winner), 200
-            case 2:
-                if count[1] >= 2:
-                    return jsonify({"message": "Đã hết giải nhì!"}), 400
-                else:
-                    chosen = random.choice(data_pool)
-                    data_pool.remove(chosen)
-                    count[1] += 1
-                    collection_pool.update_one(
-                        {"code": chosen["code"]},
-                        {"$set": {"prize": "Second Prize"}},
-                    )
-                    winner = collection_guests.find_one(
-                        {"code": chosen["code"]}, {"_id": 0}
-                    )
-                    return jsonify(winner), 200
-            case 3:
-                if count[2] >= 3:
-                    return jsonify({"message": "Đã hết giải ba!"}), 400
-                else:
-                    chosen = random.choice(data_pool)
-                    data_pool.remove(chosen)
-                    count[2] += 1
-                    collection_pool.update_one(
-                        {"code": chosen["code"]},
-                        {"$set": {"prize": "Third Prize"}},
-                    )
-                    winner = collection_guests.find_one(
-                        {"code": chosen["code"]}, {"_id": 0}
-                    )
-                    return jsonify(winner), 200
-            case _:
-                return jsonify({"message": "Lỗi!"}), 400
+# @app.route("/api/wheel_prize", methods=["POST"])
+# def wheel_prize():
+#     global data_pool, count
+#     option = request.get_json()["option"]
+#     try:
+#         match option:
+#             case 1:
+#                 if count[0] >= 1:
+#                     return jsonify({"message": "Đã hết giải nhất!"}), 400
+#                 else:
+#                     chosen = random.choice(data_pool)
+#                     data_pool.remove(chosen)
+#                     count[0] += 1
+#                     collection_pool.update_one(
+#                         {"code": chosen["code"]},
+#                         {"$set": {"prize": "First Prize"}},
+#                     )
+#                     winner = collection_guests.find_one(
+#                         {"code": chosen["code"]}, {"_id": 0}
+#                     )
+#                     return jsonify(winner), 200
+#             case 2:
+#                 if count[1] >= 2:
+#                     return jsonify({"message": "Đã hết giải nhì!"}), 400
+#                 else:
+#                     chosen = random.choice(data_pool)
+#                     data_pool.remove(chosen)
+#                     count[1] += 1
+#                     collection_pool.update_one(
+#                         {"code": chosen["code"]},
+#                         {"$set": {"prize": "Second Prize"}},
+#                     )
+#                     winner = collection_guests.find_one(
+#                         {"code": chosen["code"]}, {"_id": 0}
+#                     )
+#                     return jsonify(winner), 200
+#             case 3:
+#                 if count[2] >= 3:
+#                     return jsonify({"message": "Đã hết giải ba!"}), 400
+#                 else:
+#                     chosen = random.choice(data_pool)
+#                     data_pool.remove(chosen)
+#                     count[2] += 1
+#                     collection_pool.update_one(
+#                         {"code": chosen["code"]},
+#                         {"$set": {"prize": "Third Prize"}},
+#                     )
+#                     winner = collection_guests.find_one(
+#                         {"code": chosen["code"]}, {"_id": 0}
+#                     )
+#                     return jsonify(winner), 200
+#             case _:
+#                 return jsonify({"message": "Lỗi!"}), 400
 
-        return jsonify({"message": "Thành công!"}), 200
-    except Exception as e:
-        return jsonify({"message": f"Lỗi: {e}"}), 500
+#         return jsonify({"message": "Thành công!"}), 200
+#     except Exception as e:
+#         return jsonify({"message": f"Lỗi: {e}"}), 500
 
 
 # route cap nhat trang thai khach hang
@@ -260,7 +359,6 @@ def update_guest():
                 {"code": data["code"]},
                 {
                     "$set": {
-                        "status": True,
                         "image": data["image"],
                         "timestamp": datetime.now(timezone.utc),
                     }
@@ -326,56 +424,9 @@ def get_starttime():
         return jsonify({"message": f"Lỗi: {e}"}), 500
 
 
-
-
-# TCP server configuration
-host = os.getenv("TCP_HOST")
-port = int(os.getenv("TCP_PORT"))
-tcp_data = []
-seen_tids = set()
-
-# TCP server function
-def start_tcp_client():
-    global tcp_data, seen_tids
-    decoder = json.JSONDecoder()
-    buffer = ""
-
-    while True:
-        try:
-            with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-                s.connect((host, port))
-                s.sendall(b"OK")
-
-                while True:
-                    data = s.recv(1024)
-                    if not data:
-                        break
-
-                    buffer += data.decode()
-
-                    while buffer:
-                        try:
-                            json_obj, idx = decoder.raw_decode(buffer)
-                            data_obj = json_obj.get("data", {})
-                            tid = data_obj.get("TID")
-
-                            if tid and tid not in seen_tids:
-                                if tid[:5] != "Error" and tid[:13] != "Not Attempted":
-                                    tcp_data.append(data_obj)
-                                    seen_tids.add(tid)
-                                    print("Thêm TID mới: ", tid)
-
-                            buffer = buffer[idx:].lstrip()
-                        except json.JSONDecodeError:
-                            break
-
-        except Exception as e:
-            print(f"Lỗi TCP client: {e}")
-            time.sleep(2)
-
-
 if __name__ == "__main__":
     threading.Thread(target=listen_to_changes_guests, daemon=True).start()
     threading.Thread(target=listen_to_changes_pool, daemon=True).start()
-    # threading.Thread(target=start_tcp_client, daemon=True).start()
+    threading.Thread(target=start_tcp_client, daemon=True).start()
+    threading.Thread(target=update_status, daemon=True).start()
     app.run(host="0.0.0.0", port=5000, debug=False)

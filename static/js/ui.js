@@ -42,10 +42,9 @@ export function renderGuestTable(guestsData, currentPage, rowsPerPage) {
     row.className = "odd:bg-white even:bg-gray-50 border-b border-gray-200";
     row.innerHTML = `
         <td class="px-4 py-2">${start + index + 1}</td>
-        <td class="px-4 py-2"><img src="${guest.url}" id="${guest.code}" class="h-[41px] cursor-pointer"></td>
+        <td class="px-4 py-2"><div class="w-[41px] h-[41px]"><img src="${guest.url}" id="${guest.code}" class="cursor-pointer h-[41px] w-auto object-cover"></div></td>
         <td class="px-4 py-2">${guest.data.name}</td>
         <td class="px-4 py-2">${guest.data.company}</td>
-        <td class="px-4 py-2">${guest.data.position}</td>
         <td class="px-4 py-2">${guest.data.tableid}</td>
         <td class="px-4 py-2 ${
           guest.status ? "text-green-500" : "text-red-500"
@@ -67,7 +66,7 @@ export function hiddenGuestInfo(guestsData) {
       e.preventDefault();
       pcontent.innerHTML = `
         <img src="${guest.url}" class="border border-none rounded-full w-70 aspect-square" alt="Guest"/>
-        <p class="mt-8"><strong>Họ tên: </strong> ${guest.data.name}</p>
+        <p class="mt-8"><strong>${guest.data.name}</strong></p>
         <p><strong>Công ty: </strong> ${guest.data.company}</p>
         <p><strong>Chức vụ: </strong> ${guest.data.position}</p>
         <p><strong>Bàn số ${guest.data.tableid}</strong></p>

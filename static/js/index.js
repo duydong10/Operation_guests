@@ -14,7 +14,7 @@ import { initCountdown } from "./countdown.js";
 
 let guestsData = [];
 let currentPage = 1;
-let rowsPerPage = 8;
+let rowsPerPage = 11;
 
 async function updateGuestCheckin() {
   try {
@@ -54,16 +54,16 @@ async function updateGuestData() {
     const notCheckedIn = res
       .filter((g) => !g.status)
       .sort((a, b) => {
-        const nameA = (a.data?.name || "").toLowerCase();
-        const nameB = (b.data?.name || "").toLowerCase();
-        return nameA.localeCompare(nameB);
+        const codeA = (a?.code || "").toLowerCase();
+        const codeB = (b?.code || "").toLowerCase();
+        return codeA.localeCompare(codeB);
       });
 
     guestsData = [...checkedIn, ...notCheckedIn];
     renderGuestTable(guestsData, currentPage, rowsPerPage);
     renderPagination(guestsData, currentPage, rowsPerPage, changePage);
 
-    setTimeout(hiddenGuestInfo(guestsData), 100);
+    setTimeout(() => hiddenGuestInfo(guestsData), 100);
   } catch (err) {
     console.error("Lỗi khi lấy dữ liệu khách mời:", err);
   }
@@ -73,6 +73,7 @@ function changePage(page) {
   currentPage = page;
   renderGuestTable(guestsData, currentPage, rowsPerPage);
   renderPagination(guestsData, currentPage, rowsPerPage, changePage);
+  setTimeout(() => hiddenGuestInfo(guestsData), 100);
 }
 
 function calculateRowsPerPage() {
@@ -97,6 +98,7 @@ function calculateRowsPerPage() {
     console.log("Cập nhật rowsPerPage:", rowsPerPage);
     renderGuestTable(guestsData, currentPage, rowsPerPage);
     renderPagination(guestsData, currentPage, rowsPerPage, changePage);
+    setTimeout(() => hiddenGuestInfo(guestsData), 100);
   }
 }
 
