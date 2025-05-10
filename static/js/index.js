@@ -47,7 +47,7 @@ async function updateGuestData() {
     const res = await fetchGetGuests();
 
     const checkedIn = res
-      .filter((g) => g.status && g.timestamp)
+      .filter((g) => g.image && g.timestamp)
       .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
 

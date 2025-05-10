@@ -1,6 +1,7 @@
 export function showGuestInfo(data, url) {
   document.getElementById("guest-image").innerHTML = `
-      <img src="${url}" class="border border-none rounded-full min-w-full aspect-square" alt="Guest"/>
+  <div class="">
+      <img src="${url}" class="border-none rounded-full overflow-hidden w-min-full aspect-square" alt="Guest"/>
     `;
   document.getElementById("guest-checkin").innerHTML = `
       <ul class="pl-10">
@@ -42,14 +43,18 @@ export function renderGuestTable(guestsData, currentPage, rowsPerPage) {
     row.className = "odd:bg-white even:bg-gray-50 border-b border-gray-200";
     row.innerHTML = `
         <td class="px-4 py-2">${start + index + 1}</td>
-        <td class="px-4 py-2"><div class="w-[41px] h-[41px]"><img src="${guest.url}" id="${guest.code}" class="cursor-pointer h-[41px] w-auto object-cover"></div></td>
+        <td class="px-4 py-2"><div class="w-11 h-11 overflow-hidden"><img src="${
+          guest.url
+        }" id="${
+      guest.code
+    }" class="cursor-pointer h-11 object-cover"></div></td>
         <td class="px-4 py-2">${guest.data.name}</td>
         <td class="px-4 py-2">${guest.data.company}</td>
         <td class="px-4 py-2">${guest.data.tableid}</td>
         <td class="px-4 py-2 ${
-          guest.status ? "text-green-500" : "text-red-500"
+          guest.image ? "text-green-500" : "text-red-500"
         }">
-          ${guest.status ? "Đã check-in" : "Chưa check-in"}
+          ${guest.image ? "Đã check-in" : "Chưa check-in"}
         </td>
       `;
     tbody.appendChild(row);

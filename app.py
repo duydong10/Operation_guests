@@ -190,24 +190,22 @@ def update_status():
                 time.sleep(1)
                 continue
 
-            print(f"Đã quét mã: {code}")
-            check = collection_guests.find_one({"code": code}, {"status": 1})
+            check = collection_guests.find_one({"code": code}, {})
 
             if check is None:
                 print("Không tìm thấy khách mời!")
-                continue
-
-            if check["status"] == False:
-                result = collection_guests.update_one(
-                    {"code": code},
-                    {"$set": {"status": True}},
-                )
-                if result.matched_count == 0:
-                    print("Không tìm thấy khách mời khi cập nhật!")
-                else:
-                    print("Đã qua cửa!")
             else:
-                print("Khách đã qua cửa trước đó!")
+                if check["status"] == False:
+                    if check["image"] is None:
+                        tcp_queue.append({"code": code})
+                    else:
+                        collection_guests.update_one(
+                            {"code": code},
+                            {"$set": {"status": True}},
+                        )
+                        print(f"{code} đã qua cửa!")
+                else:
+                    print("Khách đã qua cửa trước đó!")
     except Exception as e:
         print(f"Lỗi: {e}")
 
@@ -218,7 +216,7 @@ def get_guests():
     global data_guests
     try:
         for guest in data_guests:
-            if guest["status"]:
+            if guest["image"]:
                 url = clientMinIO.presigned_get_object(bucket_name, guest["image"])
                 guest["url"] = url
             else:
