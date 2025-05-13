@@ -1,7 +1,7 @@
 export function showGuestInfo(data, url) {
   document.getElementById("guest-image").innerHTML = `
   <div class="">
-      <img src="${url}" class="border-none rounded-full overflow-hidden w-min-full aspect-square" alt="Guest"/>
+      <img src="${url}" class="border-none rounded-full overflow-hidden min-w-full aspect-square" alt="Guest"/></div>
     `;
   document.getElementById("guest-checkin").innerHTML = `
       <ul class="pl-10">
@@ -21,7 +21,7 @@ export function showGuestInfo(data, url) {
     document.getElementById("guest-checkin").innerHTML = `
         <p class="text-gray-400 text-center">No Information</p>
       `;
-  }, 5000);
+  }, 3000);
 }
 
 export function showGuestCount(count) {
@@ -70,7 +70,7 @@ export function hiddenGuestInfo(guestsData) {
     el.addEventListener("click", function (e) {
       e.preventDefault();
       pcontent.innerHTML = `
-        <img src="${guest.url}" class="border border-none rounded-full w-70 aspect-square" alt="Guest"/>
+        <img src="${guest.url}" class="border border-none rounded-full w-full aspect-square" alt="Guest"/>
         <p class="mt-8"><strong>${guest.data.name}</strong></p>
         <p><strong>Công ty: </strong> ${guest.data.company}</p>
         <p><strong>Chức vụ: </strong> ${guest.data.position}</p>

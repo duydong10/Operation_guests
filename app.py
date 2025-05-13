@@ -26,8 +26,8 @@ collection_award = db[os.getenv("COLLECTION_AWARD")]
 # init minIO
 clientMinIO = Minio(
     endpoint=os.getenv("MINIO_ENDPOINT"),
-    access_key=os.getenv("MINIO_ACCESS_KEY"),
-    secret_key=os.getenv("MINIO_SECRET_KEY"),
+    # access_key=os.getenv("MINIO_ACCESS_KEY"),
+    # secret_key=os.getenv("MINIO_SECRET_KEY"),
     secure=False,
 )
 bucket_name = os.getenv("MINIO_BUCKETNAME")
@@ -65,17 +65,14 @@ def listen_to_changes_guests():
                 number_of_guests = collection_guests.count_documents({})
                 guests_true = collection_guests.count_documents({"status": True})
 
-                updated_fields = change["updateDescription"]["updatedFields"]
                 if change["operationType"] == "update":
-                    
+                    updated_fields = change["updateDescription"]["updatedFields"]
                     if "status" in updated_fields and updated_fields["status"] == True:
                         last_guest = collection_guests.find_one(
                             {"_id": change["documentKey"]["_id"]}, {"_id": 0}
                         )
                     else:
                         last_guest = {}
-                elif change["operationType"] == "insert":
-                    last_guest = change.get("fullDocument", {})
     except Exception as e:
         print("Lỗi khi lắng nghe guests:", e)
 
@@ -130,7 +127,7 @@ def hex_to_text(hex_string):
         return hex_string
 
 
-# TCP server function
+# TCP client function
 def start_tcp_client():
     global tcp_queue, seen_idhexs
     decoder = json.JSONDecoder()
@@ -154,6 +151,7 @@ def start_tcp_client():
                             json_obj, idx = decoder.raw_decode(buffer)
                             data_obj = json_obj.get("data", {})
                             idhex = data_obj.get("idHex")
+                            # rssi = data_obj.get("peakRssi")
 
                             if idhex and idhex not in seen_idhexs:
                                 if (
@@ -349,27 +347,23 @@ def get_rfid():
 def update_guest():
     try:
         data = request.get_json()
-        check = collection_guests.find_one({"code": data["code"]}, {"status": 1})
-        if check["status"] == True:
-            return jsonify({"message": "Khách đã check-in trước đó!"}), 400
-        else:
-            result = collection_guests.update_one(
-                {"code": data["code"]},
-                {
-                    "$set": {
-                        "image": data["image"],
-                        "timestamp": datetime.now(timezone.utc),
-                    }
-                },
+        result = collection_guests.update_one(
+            {"code": data["code"]},
+            {
+                "$set": {
+                    "image": data["image"],
+                    "timestamp": datetime.now(timezone.utc),
+                }
+            },
+        )
+        check_pool = collection_pool.find_one({"code": data["code"]}, {"_id": 0})
+        if not check_pool:
+            collection_pool.insert_one(
+                {"code": data["code"], "id_award": None, "timestamp": None}
             )
-            check_pool = collection_pool.find_one({"code": data["code"]}, {"_id": 0})
-            if not check_pool:
-                collection_pool.insert_one(
-                    {"code": data["code"], "id_award": None, "timestamp": None}
-                )
         if result.matched_count == 0:
             return jsonify({"message": "Không tìm thấy khách mời!"}), 404
-        return jsonify({"message": "Check-in thành công!"}), 200
+        return jsonify({"message": "Cập nhật ảnh thành công!"}), 200
     except Exception as e:
         return jsonify({"message": f"Lỗi: {e}"}), 500
 
@@ -378,11 +372,22 @@ def update_guest():
 def insert_guest():
     try:
         data = request.get_json()
-        data["image"] = None
-        data["status"] = False
-        data["timestamp"] = None
-        collection_guests.insert_one(data)
-        return jsonify({"message": "Thêm thành công!"}), 200
+        collection_guests.insert_one(
+            {
+                "data": {
+                    "name": data["data"]["name"],
+                    "company": data["data"]["company"],
+                    "role": "extra",
+                    "position": "VIP",
+                    "tableid": None,
+                },
+                "image": None,
+                "code": data["code"],
+                "status": False,
+                "timestamp": None,
+            }
+        )
+        return jsonify({"message": "Thêm khách thành công!"}), 200
     except Exception as e:
         return jsonify({"message": f"Lỗi: {e}"}), 500
 

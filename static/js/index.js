@@ -4,11 +4,12 @@ import {
   fetchGetGuests,
 } from "./api.js";
 import {
-  showGuestInfo,
   showGuestCount,
   renderGuestTable,
   hiddenGuestInfo,
+  showGuestInfo,
 } from "./ui.js";
+
 import { renderPagination } from "./pagination.js";
 import { initCountdown } from "./countdown.js";
 
@@ -49,7 +50,6 @@ async function updateGuestData() {
     const checkedIn = res
       .filter((g) => g.image && g.timestamp)
       .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
 
     const notCheckedIn = res
       .filter((g) => !g.status)
