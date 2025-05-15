@@ -21,7 +21,7 @@ async function updateGuestCheckin() {
   try {
     const res = await fetchGetLastGuest();
     if (res.data) {
-      showGuestInfo(res.data, res.url);
+      showGuestInfo(res.data, res.url, res.code);
     } else {
       console.warn(res.message || "Không có dữ liệu.");
     }
@@ -52,7 +52,7 @@ async function updateGuestData() {
       .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
     const notCheckedIn = res
-      .filter((g) => !g.status)
+      .filter((g) => !g.image)
       .sort((a, b) => {
         const codeA = (a?.code || "").toLowerCase();
         const codeB = (b?.code || "").toLowerCase();

@@ -1,32 +1,29 @@
-export function showGuestInfo(data, url) {
+export function showGuestInfo(data, url, code) {
   document.getElementById("guest-image").innerHTML = `
   <div class="">
-      <img src="${url}" class="border-none rounded-full overflow-hidden min-w-full aspect-square" alt="Guest"/></div>
+      <img src="${url}" class="border-blue-600 border-2 rounded-full w-[300px] h-[300px] aspect-square p-1" alt="Guest"/></div>
     `;
   document.getElementById("guest-checkin").innerHTML = `
-      <ul class="pl-10">
-        <li class="mb-2"><p><strong>Họ tên: </strong>${data.name}</p></li>
-        <li class="mb-2"><p><strong>Công ty: </strong>${data.company}</p></li>
-        <li class="mb-2"><p><strong>Chức vụ: </strong>${data.position}</p></li>
-        <li class="mb-2"><p><strong>Số bàn: </strong>${data.tableid}</p></li>
+      <ul>
+        <li class="text-black"><p><strong>${
+    data.name
+  }</strong></p></li>
+        <li class="text-sm text-gray-500"><p>${data.company}</p></li>
+        <li><div class="flex flex-row justify-center-safe mt-1">
+          <p class="text-center border rounded-l-lg border-gray-400 py-1 px-2">Chức danh<br><strong>${data.position}</strong></p>
+          <p class="text-center border border-gray-400 py-1 px-2">Code<br><strong>${code}</strong></p>
+          <p class="text-center border rounded-r-lg border-gray-400 py-1 px-2">Bàn tiệc số<br><strong>${data.tableid}</strong></p>
+          </div></li>
       </ul>
+      <p class="text-center text-gray-400 p-2">Chân thành cảm ơn Quý khách hàng - Quý đối tác đã tham gia sự kiện <strong>Kỷ niệm 10 năm thành lập Tân Hưng Hà và Công bố thành lập THH Holdings!</strong></p>
     `;
   document.getElementById("guest-image").style.display = "inline";
   document.getElementById("guest-checkin").style.display = "inline";
-
-  setTimeout(() => {
-    document.getElementById("guest-image").innerHTML = `
-        <img src="../static/images/portrait-placeholder.jpg" class="border border-none rounded-full min-w-full aspect-square" />
-      `;
-    document.getElementById("guest-checkin").innerHTML = `
-        <p class="text-gray-400 text-center">No Information</p>
-      `;
-  }, 3000);
 }
 
 export function showGuestCount(count) {
   document.getElementById("number-of-guests").innerHTML = `
-      <strong>${count}</strong>
+      ${count}
     `;
 }
 
@@ -42,19 +39,21 @@ export function renderGuestTable(guestsData, currentPage, rowsPerPage) {
     const row = document.createElement("tr");
     row.className = "odd:bg-white even:bg-gray-50 border-b border-gray-200";
     row.innerHTML = `
-        <td class="px-4 py-2">${start + index + 1}</td>
-        <td class="px-4 py-2"><div class="w-11 h-11 overflow-hidden"><img src="${
-          guest.url
-        }" id="${
+        <td class="px-4 py-2 text-center">${start + index + 1}</td>
+        <td class="px-4 py-2 flex justify-center"><img src="${guest.url}" id="${
       guest.code
-    }" class="cursor-pointer h-11 object-cover"></div></td>
-        <td class="px-4 py-2">${guest.data.name}</td>
-        <td class="px-4 py-2">${guest.data.company}</td>
-        <td class="px-4 py-2">${guest.data.tableid}</td>
-        <td class="px-4 py-2 ${
-          guest.image ? "text-green-500" : "text-red-500"
+    }" class="cursor-pointer h-11 w-11 rounded-lg text-center"></td>
+        <td class="px-4 py-2 text-left">${
+      guest.data.name
+    }</td>
+        <td class="px-4 py-2 text-center">${guest.data.company}</td>
+        <td class="px-4 py-2 text-center"><div class="border-none rounded-lg bg-gray-100 h-7 grid place-items-center"><p>${
+          guest.data.tableid ? guest.data.tableid : "extra"
+        }<p></div></td>
+        <td class="px-4 py-2 text-center ${
+          guest.image ? "text-green-500" : "text-gray-500"
         }">
-          ${guest.image ? "Đã check-in" : "Chưa check-in"}
+          <strong>${guest.image ? "Đã check-in" : "Chưa check-in"}</strong>
         </td>
       `;
     tbody.appendChild(row);
@@ -70,8 +69,12 @@ export function hiddenGuestInfo(guestsData) {
     el.addEventListener("click", function (e) {
       e.preventDefault();
       pcontent.innerHTML = `
-        <img src="${guest.url}" class="border border-none rounded-full w-full aspect-square" alt="Guest"/>
-        <p class="mt-8"><strong>${guest.data.name}</strong></p>
+        <img src="${
+          guest.url
+        }" class="border border-none rounded-full w-full aspect-square" alt="Guest"/>
+        <p class="mt-8"><strong>${
+        guest.data.name
+      }</strong></p>
         <p><strong>Công ty: </strong> ${guest.data.company}</p>
         <p><strong>Chức vụ: </strong> ${guest.data.position}</p>
         <p><strong>Bàn số ${guest.data.tableid}</strong></p>

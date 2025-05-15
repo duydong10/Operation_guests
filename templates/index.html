@@ -14,21 +14,19 @@
     />
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
   </head>
 
   <body
-    class="font-sans bg-gray-100 min-h-screen grid grid-rows-12 grid-cols-10 h-20"
+    class="bg-gray-100 min-h-screen grid grid-rows-12 grid-cols-10 h-20"
   >
-    <nav class="bg-white border-gray-200 col-span-10 row-start-1">
+    <nav class="bg-white col-span-10 row-start-1 border border-gray-400">
       <div class="w-auto flex items-center justify-between px-6">
-        <a href="https://tanhungha.com.vn/" class="w-xs py-1.5">
-          <img src="../static/images/logo.png" alt="Logo" />
+        <a href="https://tanhungha.com.vn/" class="w-xs">
+          <img src="../static/images/reboot10.png" alt="Logo" />
         </a>
-        <div>
-          <strong class="2xl:text-4xl xl:text-3xl lg:text-2xl md:text-xl text-lg text-blue-800 pr-60"
-            >THÔNG TIN CHECK-IN KHÁCH HÀNG</strong
-          >
-        </div>
         <button
           id="dropdownNavbarLink"
           data-dropdown-toggle="dropdownNavbar"
@@ -75,71 +73,73 @@
       </div>
     </nav>
 
-    <!-- Khách mới check-in -->
-    <div
-      id="check-in-in4"
-      class="grid grid-rows-8 grid-cols-5 bg-white rounded-md mx-5 mb-5 row-span-7 row-start-6 col-span-5"
-    >
+    <div class="flex flex-col col-span-4 row-span-full row-start-2 bg-white">
       <div
         class="2xl:text-3xl xl:text-2xl lg:text-xl md:text-lg text-xs col-span-5 text-center self-center p-3"
       >
-        <strong class="text-blue-800">Chào mừng quý khách</strong>
+        <img src="../static/images/welcome.png" alt="Welcome" class="w-full" />
       </div>
-      <div id="guest-image" class="row-span-7 self-center pl-10 col-span-2">
-        <img
-          src="../static/images/portrait-placeholder.jpg"
-          class="border border-none rounded-full min-w-full aspect-square"
-        />
+      <!-- Khách mới check-in -->
+      <div id="check-in-in4" class="flex flex-col bg-white">
+        <div id="guest-image" class="self-center p-5">
+          <img
+            src="../static/images/portrait-placeholder.jpg"
+            class="border-blue-600 border-2 rounded-full w-[300px] h-[300px] aspect-square p-1"
+          />
+        </div>
+        <div
+          id="guest-checkin"
+          class="xl:text-2xl lg:text-xl md:text-lg text-sm self-center text-center h-[210px]"
+        >
+          <p class="text-gray-400 text-center">No Information</p>
+        </div>
       </div>
-      <div
-        id="guest-checkin"
-        class="xl:text-2xl lg:text-xl md:text-lg text-sm self-center row-span-7 col-span-3 text-left pl-20 pr-10"
-      >
-        <p class="text-gray-400 text-center">No Information</p>
-      </div>
-    </div>
+      <div class="flex flex-row">
+        <!-- Số lượng khách mời đã check-in -->
+        <div class="flex flex-row bg-white text-center w-1/2 h-[100px] border-blue-600 border rounded-xl mx-10">
+          <img src="../static/images/people1.png" alt="People" />
+          <div
+            class="flex flex-col 2xl:text-2xl xl:text-xl lg:text-lg text-sm p-3"
+          >
+            <strong class="text-blue-700">Khách mời tham dự</strong>
+            <div id="number-of-guests" class="text-3xl text-gray-500"></div>
+          </div>
+          
+        </div>
 
-    <!-- Số lượng khách mời đã check-in -->
-    <div
-      class="bg-white rounded-md m-5 row-start-2 row-span-4 col-span-2 text-center"
-    >
-      <div class="2xl:text-3xl xl:text-2xl lg:text-xl md:text-lg text-xs p-3">
-        <strong class="text-blue-800">Khách mời tham dự</strong>
+        <!-- Thời gian đếm ngược -->
+        <div class="flex flex-row bg-white text-center w-1/2 h-[100px] border-blue-600 border rounded-xl mx-10">
+          <img src="../static/images/clock.png" class="" alt="People" />
+          <div
+            class="flex flex-col 2xl:text-2xl xl:text-xl lg:text-lg text-xs p-3"
+          >
+            <strong class="text-blue-700">Đếm ngược sự kiện</strong>
+            <div id="countdown" class="text-3xl text-gray-500"></div>
+          </div>
+          
+        </div>
       </div>
-      <div id="number-of-guests" class="text-8xl self-center mt-14"></div>
-    </div>
-
-    <!-- Thời gian đếm ngược -->
-    <div
-      class="bg-white rounded-md my-5 mr-5 row-start-2 row-span-4 col-span-3 text-center"
-    >
-      <div class="2xl:text-3xl xl:text-2xl lg:text-xl md:text-lg text-xs p-3">
-        <strong class="text-blue-800">Đếm ngược bắt đầu sự kiện</strong>
-      </div>
-      <div id="countdown" class="text-5xl self-center mt-20"></div>
     </div>
 
     <!-- Danh sách khách mời -->
-    <div
-      class="bg-white rounded-md mr-5 my-5 row-start-2 col-span-5 row-span-full flex flex-col"
-    >
+    <div class="bg-white row-start-2 col-span-6 row-span-full flex flex-col">
       <div
-        class="2xl:text-3xl xl:text-2xl lg:text-xl md:text-lg text-xs p-3 text-center"
+        class="2xl:text-4xl xl:text-3xl lg:text-2xl md:text-xl text-lg p-3 text-left"
       >
-        <strong class="text-blue-800">Danh sách khách mời</strong>
+        <strong class="text-black">Danh sách khách mời</strong>
       </div>
       <div
         id="divtable"
         class="relative flex-grow overflow-x-auto sm:rounded-lg"
       >
-        <table class="w-full table-fixed text-sm text-left text-gray-500">
-          <thead class="text-xs text-black uppercase bg-[#ced6e0]">
+        <table class="w-full table-fixed text-sm text-gray-500 border border-gray-400">
+          <thead class="text-xs text-black text-center uppercase bg-[#bec2c7]">
             <tr>
               <th scope="col" class="px-4 py-2 w-1/12 h-10">STT</th>
-              <th scope="col" class="px-4 py-2 w-1/6 h-10">Ảnh</th>
-              <th scope="col" class="px-4 py-2 w-1/3 h-10">Họ tên</th>
-              <th scope="col" class="px-4 py-2 w-1/4 h-10">Công ty</th>
-              <th scope="col" class="px-4 py-2 w-1/6 h-10">Số bàn</th>
+              <th scope="col" class="px-4 py-2 w-1/6 h-10">Avatar</th>
+              <th scope="col" class="px-4 py-2 w-1/3 h-10">Họ & tên</th>
+              <th scope="col" class="px-4 py-2 w-1/4 h-10">Đơn vị</th>
+              <th scope="col" class="px-4 py-2 w-1/6 h-10">Bàn tiệc</th>
               <th scope="col" class="px-4 py-2 w-1/6 h-10">Trạng thái</th>
             </tr>
           </thead>
@@ -148,17 +148,19 @@
       </div>
       <div id="pagination-guests" class="my-2 mx-4"></div>
     </div>
-    <div id="hidden-container" style="display: none;">
+    <div id="hidden-container" style="display: none">
       <div
         id="overlay"
         class="fixed inset-0 bg-black opacity-50 z-998 flex justify-center items-center"
       ></div>
       <div
-        class="fixed shadow-xl rounded-xl top-1/2 left-1/2 z-999 p-10 w-1/4 h-180 bg-white"
+        class="fixed shadow-xl rounded-xl top-1/2 left-1/2 z-999 p-10 w-1/4 h-160 bg-white"
         id="hidden-popup"
         style="transform: translate(-50%, -50%)"
       >
-        <div id="popup-content" class="text-center text-black"><p>test</p></div>
+        <div id="popup-content" class="text-center text-black text-xl/7">
+          <p>test</p>
+        </div>
         <button
           id="close-popup"
           class="absolute top-2 right-2 bg-red-500 text-white rounded-full aspect-square w-6"

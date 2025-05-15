@@ -46,7 +46,14 @@ function countdown() {
   const seconds = String(diffSeconds).padStart(2, "0");
 
   const el = document.getElementById("countdown");
-  if (el) el.innerHTML = `${hours}:${minutes}:${seconds}`;
+  if (el) {
+    if (hours === "00" && minutes === "00" && seconds === "00") {
+      el.innerHTML = "Live Now!";
+      return;
+    } else {
+      el.innerHTML = `${hours}:${minutes}:${seconds}`;
+    }
+  }
 }
 
 /**
