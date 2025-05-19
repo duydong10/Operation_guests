@@ -9,24 +9,23 @@
       src="{{url_for('static', filename='js/index.js')}}"
     ></script>
     <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css"
+      href="../static//css/flowbite.min.css"
       rel="stylesheet"
     />
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="https://cdn.jsdelivr.net/npm/flowbite@3.1.2/dist/flowbite.min.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <script src="../static/src/tailwind.js"></script> 
+    <script src="../static/src/flowbite312.js"></script>
+    <!-- <link rel="preconnect" href="https://fonts.googleapis.com"> -->
+    <!-- <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
+    <!-- <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet"> -->
+    <link href="../static/css/tailwind.css" rel="stylesheet">
   </head>
 
   <body
-    class="bg-gray-100 min-h-screen grid grid-rows-12 grid-cols-10 h-20"
+    class="font-sans bg-gray-100 min-h-screen grid grid-rows-12 grid-cols-10 h-20"
   >
-    <nav class="bg-white col-span-10 row-start-1 border border-gray-400">
+    <nav class="bg-white col-span-10 row-start-1" style="border-bottom: 1px solid; border-color:rgb(177, 177, 177);">
       <div class="w-auto flex items-center justify-between px-6">
-        <a href="https://tanhungha.com.vn/" class="w-xs">
-          <img src="../static/images/reboot10.png" alt="Logo" />
-        </a>
+        <img src="../static/images/reboot10.png" class="h-12 w-auto pt-2" alt="Logo" />
         <button
           id="dropdownNavbarLink"
           data-dropdown-toggle="dropdownNavbar"
@@ -57,14 +56,14 @@
             <li class="group">
               <a
                 href="{{url_for('index')}}"
-                class="block pl-4 py-2 duration-300 hover:pl-5"
+                class="block pl-8 py-2 duration-300 hover:pl-5"
                 >Dashboard</a
               >
             </li>
             <li>
               <a
                 href="{{url_for('settings')}}"
-                class="block pl-4 py-2 duration-300 hover:pl-5"
+                class="block pl-8 py-2 duration-300 hover:pl-5"
                 >Settings</a
               >
             </li>
@@ -73,48 +72,48 @@
       </div>
     </nav>
 
-    <div class="flex flex-col col-span-4 row-span-full row-start-2 bg-white">
+    <div class="flex flex-col col-span-4 row-span-11 row-start-2 bg-white">
       <div
         class="2xl:text-3xl xl:text-2xl lg:text-xl md:text-lg text-xs col-span-5 text-center self-center p-3"
       >
-        <img src="../static/images/welcome.png" alt="Welcome" class="w-full" />
+        <img src="../static/images/welcome.png" alt="Welcome" class="w-auto h-100" />
       </div>
       <!-- Khách mới check-in -->
       <div id="check-in-in4" class="flex flex-col bg-white">
         <div id="guest-image" class="self-center p-5">
           <img
             src="../static/images/portrait-placeholder.jpg"
-            class="border-blue-600 border-2 rounded-full w-[300px] h-[300px] aspect-square p-1"
+            class="border-blue-600 border-2 rounded-full w-[200px] h-[200px] aspect-square p-1"
           />
         </div>
         <div
           id="guest-checkin"
-          class="xl:text-2xl lg:text-xl md:text-lg text-sm self-center text-center h-[210px]"
+          class="text-sm self-center text-center h-[150px]"
         >
           <p class="text-gray-400 text-center">No Information</p>
         </div>
       </div>
-      <div class="flex flex-row">
+      <div class="flex flex-row justify-around px-4">
         <!-- Số lượng khách mời đã check-in -->
-        <div class="flex flex-row bg-white text-center w-1/2 h-[100px] border-blue-600 border rounded-xl mx-10">
-          <img src="../static/images/people1.png" alt="People" />
+        <div class="flex flex-row bg-white text-center w-2/5 h-[70px] border-blue-600 border rounded-xl mx-10">
+          <img src="../static/images/people1.png" class="h-10 w-10 my-4 mx-1" alt="People" />
           <div
-            class="flex flex-col 2xl:text-2xl xl:text-xl lg:text-lg text-sm p-3"
+            class="flex flex-col text-xs p-3"
           >
             <strong class="text-blue-700">Khách mời tham dự</strong>
-            <div id="number-of-guests" class="text-3xl text-gray-500"></div>
+            <div id="number-of-guests" class="text-xl text-gray-500"></div>
           </div>
           
         </div>
 
         <!-- Thời gian đếm ngược -->
-        <div class="flex flex-row bg-white text-center w-1/2 h-[100px] border-blue-600 border rounded-xl mx-10">
-          <img src="../static/images/clock.png" class="" alt="People" />
+        <div class="flex flex-row bg-white text-center w-2/5 h-[70px] border-blue-600 border rounded-xl mx-10">
+          <img src="../static/images/clock.png" class="h-10 w-10 my-4 mx-1" alt="People" />
           <div
-            class="flex flex-col 2xl:text-2xl xl:text-xl lg:text-lg text-xs p-3"
+            class="flex flex-col text-xs p-3"
           >
             <strong class="text-blue-700">Đếm ngược sự kiện</strong>
-            <div id="countdown" class="text-3xl text-gray-500"></div>
+            <div id="countdown" class="text-xl text-gray-500"></div>
           </div>
           
         </div>
@@ -122,7 +121,7 @@
     </div>
 
     <!-- Danh sách khách mời -->
-    <div class="bg-white row-start-2 col-span-6 row-span-full flex flex-col">
+    <div class="bg-white row-start-2 col-span-6 row-span-11 flex flex-col">
       <div
         class="2xl:text-4xl xl:text-3xl lg:text-2xl md:text-xl text-lg p-3 text-left"
       >
@@ -154,12 +153,11 @@
         class="fixed inset-0 bg-black opacity-50 z-998 flex justify-center items-center"
       ></div>
       <div
-        class="fixed shadow-xl rounded-xl top-1/2 left-1/2 z-999 p-10 w-1/4 h-160 bg-white"
+        class="fixed shadow-xl rounded-xl top-1/2 left-1/2 z-999 w-120 h-100 bg-white"
         id="hidden-popup"
         style="transform: translate(-50%, -50%)"
       >
-        <div id="popup-content" class="text-center text-black text-xl/7">
-          <p>test</p>
+        <div id="popup-content" class="flex flex-col text-black text-xl/7 py-4">
         </div>
         <button
           id="close-popup"

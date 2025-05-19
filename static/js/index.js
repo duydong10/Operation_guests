@@ -15,7 +15,7 @@ import { initCountdown } from "./countdown.js";
 
 let guestsData = [];
 let currentPage = 1;
-let rowsPerPage = 11;
+let rowsPerPage = 8;
 
 async function updateGuestCheckin() {
   try {
@@ -103,20 +103,20 @@ function calculateRowsPerPage() {
 }
 
 window.addEventListener("DOMContentLoaded", function () {
-  const tbody = document.getElementById("tbody-guests");
+  // const tbody = document.getElementById("tbody-guests");
 
-  calculateRowsPerPage();
+  // calculateRowsPerPage();
   updateGuestCount();
   updateGuestData();
 
-  if (tbody) {
-    const resizeObserver = new ResizeObserver(() => {
-      calculateRowsPerPage();
-    });
-    resizeObserver.observe(tbody);
-  }
+  // if (tbody) {
+  //   const resizeObserver = new ResizeObserver(() => {
+  //     calculateRowsPerPage();
+  //   });
+  //   resizeObserver.observe(tbody);
+  // }
 
-  window.addEventListener("resize", calculateRowsPerPage);
+  // window.addEventListener("resize", calculateRowsPerPage);
 
   const evtSource = new EventSource("/guests/stream");
   evtSource.onmessage = function () {

@@ -135,9 +135,12 @@ def hex_to_text(hex_string):
         return hex_string
 
 
+queueLock = threading.Lock()
+seen_idtexts = []
+
 # TCP client function
 def start_tcp_client():
-    global tcp_queue, seen_idhexs
+    global tcp_queue, seen_idtexts, queueLock
     decoder = json.JSONDecoder()
     buffer = ""
 
@@ -160,23 +163,21 @@ def start_tcp_client():
                             data_obj = json_obj.get("data", {})
                             idhex = data_obj.get("idHex")
                             rssi = data_obj.get("peakRssi")
-
-                            if idhex and idhex not in seen_idhexs:
-                                if (
-                                    idhex[:5] != "Error"
-                                    and idhex[:13] != "Not Attempted"
-                                    and len(idhex) == 12
-                                    # and rssi > -65
-                                ):
-                                    tcp_queue.append(
-                                        {
-                                            "code": bytes.fromhex(idhex).decode(
-                                                "ascii", errors="ignore"
-                                            )
-                                        }
-                                    )
-                                    seen_idhexs.add(idhex)
-
+                            idtext = hex_to_text(idhex)
+                            if (
+                                idhex[:5] != "Error"
+                                and idhex[:13] != "Not Attempted"
+                                and len(idhex) == 12
+                                and rssi > -65
+                            ):
+                                if idtext and {"code": idtext} not in tcp_queue:
+                                    if idtext in seen_idtexts:
+                                        with queueLock:
+                                            tcp_queue.append({"code": idtext})
+                                    elif idtext not in seen_idtexts:
+                                        with queueLock:
+                                            tcp_queue.insert(0, {"code": idtext})
+                                            seen_idtexts.append(idtext)
                             buffer = buffer[idx:].lstrip()
                         except json.JSONDecodeError:
                             break
@@ -190,19 +191,20 @@ pass_gate = []
 
 
 def update_status():
-    global tcp_queue, last_guest, pass_gate
+    global tcp_queue, last_guest, queueLock
     try:
         while True:
-            if tcp_queue:
-                item = tcp_queue.pop(0)
-                code = item["code"]
-            else:
-                time.sleep(1)
-                continue
+            with queueLock:
+                if tcp_queue:
+                    item = tcp_queue.pop(0)
+                    code = item["code"]
+                else:
+                    time.sleep(1)
+                    continue
 
             gate = collection_guests.find_one({"code": code}, {})
 
-            if gate and gate["code"] not in pass_gate:
+            if gate and gate["code"]:
                 if gate["status"] == True:
                     collection_guests.update_one(
                         {"code": code},
@@ -214,19 +216,9 @@ def update_status():
                         {"$set": {"status": True}},
                     )
                 print(f"{code} đã qua cửa!")
-                pass_gate.append(gate["code"])
-            time.sleep(1)
-
+            time.sleep(3)
     except Exception as e:
         print(f"Lỗi: {e}")
-
-
-def reset_seen_idhexs():
-    global seen_idhexs, pass_gate
-    while True:
-        time.sleep(60)
-        seen_idhexs.clear()
-        pass_gate.clear()
 
 
 # api tra ve json du lieu khach
@@ -239,11 +231,17 @@ def get_guests():
             sex = guest["data"]["sex"]
 
             if sex == "Nam":
-                guest["data"]["name"] = f"Mr. {name}" if not name.startswith("Mr. ") else name
+                guest["data"]["name"] = (
+                    f"Mr. {name}" if not name.startswith("Mr. ") else name
+                )
             elif sex == "Nữ":
-                guest["data"]["name"] = f"Ms. {name}" if not name.startswith("Ms. ") else name
+                guest["data"]["name"] = (
+                    f"Ms. {name}" if not name.startswith("Ms. ") else name
+                )
             else:
-                guest["data"]["name"] = f"Mr/Ms. {name}" if not name.startswith("Mr./Ms. ") else name
+                guest["data"]["name"] = (
+                    f"Mr/Ms. {name}" if not name.startswith("Mr./Ms. ") else name
+                )
 
             if guest.get("image"):
                 url = clientMinIO.presigned_get_object(bucket_name, guest["image"])
@@ -284,21 +282,17 @@ def get_count_guests():
     except Exception as e:
         return jsonify({"message": f"Lỗi: {e}"}), 500
 
-
+prev_guest = {}
 # api tra ve thong tin khach moi check-in
 @app.route("/api/get_last_guest", methods=["GET"])
 def get_last_guest():
     global last_guest
     try:
-        if not last_guest:
-            return jsonify({"message": "Chưa có khách mới!"}), 201
-        else:
-            url = clientMinIO.presigned_get_object(bucket_name, last_guest["image"])
-            lguest = last_guest.copy()
-            lguest["url"] = url
+        url = clientMinIO.presigned_get_object(bucket_name, last_guest["image"])
+        last_guest = last_guest.copy()
+        last_guest["url"] = url
 
-            last_guest = {}
-        return jsonify(lguest)
+        return jsonify(last_guest)
     except Exception as e:
         return jsonify({"message": f"Lỗi: {e}"}), 500
 
@@ -341,7 +335,7 @@ def insert_guest():
                     "role": "extra",
                     "position": "VIP",
                     "tableid": None,
-                    "sex": None
+                    "sex": None,
                 },
                 "image": None,
                 "code": data["code"],
@@ -394,5 +388,5 @@ if __name__ == "__main__":
     threading.Thread(target=listen_to_changes_pool, daemon=True).start()
     threading.Thread(target=start_tcp_client, daemon=True).start()
     threading.Thread(target=update_status, daemon=True).start()
-    threading.Thread(target=reset_seen_idhexs, daemon=True).start()
+    # threading.Thread(target=reset_seen_idhexs, daemon=True).start()
     app.run(host="0.0.0.0", port=5000, debug=False)

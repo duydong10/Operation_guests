@@ -33,7 +33,7 @@ export function renderPagination(
     html += `
       <li>
         <a href="#" data-page="${i}" class="page-btn flex items-center justify-center px-3 h-8 ${
-      i === currentPage ? "bg-blue-500 text-white" : ""
+      i === currentPage ? "bg-blue-500 text-white border-y border-gray-900" : ""
     } border">${i}</a>
       </li>`;
   }
@@ -52,8 +52,8 @@ export function renderPagination(
         <li>
           <a href="#" data-page="${
             currentPage + 1
-          }" class="page-btn flex items-center justify-center px-3 h-8 border${
-    currentPage === totalPages ? "pointer-events-none opacity-50 border" : ""
+          }" style="border-color: gray; ${currentPage === totalPages ? "border: 1px solid gray;" : ""}" class="page-btn flex items-center justify-center px-3 h-8 border${
+    currentPage === totalPages ? "pointer-events-none opacity-50" : ""
   }"> > </a>
         </li>
         <li>

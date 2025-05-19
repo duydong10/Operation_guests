@@ -12,7 +12,7 @@
   "type": "commonjs",
   "devDependencies": {
     "@tailwindcss/cli": "^4.1.4",
-    "tailwindcss": "^4.1.4"
+    "tailwindcss": "^4.1.7"
   },
   "dependencies": {
     "flowbite": "^3.1.2"
