@@ -8,24 +8,27 @@
       type="module"
       src="{{url_for('static', filename='js/index.js')}}"
     ></script>
-    <link
-      href="../static//css/flowbite.min.css"
-      rel="stylesheet"
-    />
-    <script src="../static/src/tailwind.js"></script> 
+    <link href="../static//css/flowbite.min.css" rel="stylesheet" />
+    <script src="../static/src/tailwind.js"></script>
     <script src="../static/src/flowbite312.js"></script>
-    <!-- <link rel="preconnect" href="https://fonts.googleapis.com"> -->
-    <!-- <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> -->
-    <!-- <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet"> -->
-    <link href="../static/css/tailwind.css" rel="stylesheet">
+    <link href="../static/css/tailwind.css" rel="stylesheet" />
+    <link href="../static/css/styles.css" rel="stylesheet" />
   </head>
 
   <body
-    class="font-sans bg-gray-100 min-h-screen grid grid-rows-12 grid-cols-10 h-20"
+    class="bg-gray-100 min-h-screen grid grid-rows-12 grid-cols-10 h-20"
+    style="font-family: Inter, sans-serif"
   >
-    <nav class="bg-white col-span-10 row-start-1" style="border-bottom: 1px solid; border-color:rgb(177, 177, 177);">
+    <nav
+      class="bg-white col-span-10 row-start-1"
+      style="border-bottom: 1px solid; border-color: rgb(177, 177, 177)"
+    >
       <div class="w-auto flex items-center justify-between px-6">
-        <img src="../static/images/reboot10.png" class="h-12 w-auto pt-2" alt="Logo" />
+        <img
+          src="../static/images/reboot10.png"
+          class="h-12 w-auto pt-2"
+          alt="Logo"
+        />
         <button
           id="dropdownNavbarLink"
           data-dropdown-toggle="dropdownNavbar"
@@ -50,20 +53,20 @@
         </button>
         <div id="dropdownNavbar" class="z-10 hidden font-normal w-40">
           <ul
-            class="py-2 text-lg text-blue-800 font-semibold bg-white rounded-lg shadow-xl mr-7"
+            class="py-2 text-lg text-black font-semibold bg-[#f0f0f0] rounded-lg shadow-xl mr-7"
             aria-labelledby="dropdownLargeButton"
           >
             <li class="group">
               <a
                 href="{{url_for('index')}}"
-                class="block pl-8 py-2 duration-300 hover:pl-5"
+                class="menu-btn block pl-8 py-2 duration-300 hover:pl-5"
                 >Dashboard</a
               >
             </li>
             <li>
               <a
                 href="{{url_for('settings')}}"
-                class="block pl-8 py-2 duration-300 hover:pl-5"
+                class="menu-btn block pl-8 py-2 duration-300 hover:pl-5"
                 >Settings</a
               >
             </li>
@@ -76,7 +79,11 @@
       <div
         class="2xl:text-3xl xl:text-2xl lg:text-xl md:text-lg text-xs col-span-5 text-center self-center p-3"
       >
-        <img src="../static/images/welcome.png" alt="Welcome" class="w-auto h-100" />
+        <img
+          src="../static/images/welcome.png"
+          alt="Welcome"
+          class="w-auto h-100"
+        />
       </div>
       <!-- Khách mới check-in -->
       <div id="check-in-in4" class="flex flex-col bg-white">
@@ -95,27 +102,33 @@
       </div>
       <div class="flex flex-row justify-around px-4">
         <!-- Số lượng khách mời đã check-in -->
-        <div class="flex flex-row bg-white text-center w-2/5 h-[70px] border-blue-600 border rounded-xl mx-10">
-          <img src="../static/images/people1.png" class="h-10 w-10 my-4 mx-1" alt="People" />
-          <div
-            class="flex flex-col text-xs p-3"
-          >
+        <div
+          class="flex flex-row bg-white text-center w-2/5 h-[70px] border-blue-600 border rounded-xl mx-10"
+        >
+          <img
+            src="../static/images/people1.png"
+            class="h-10 w-10 my-4 mx-1"
+            alt="People"
+          />
+          <div class="flex flex-col text-xs p-3">
             <strong class="text-blue-700">Khách mời tham dự</strong>
             <div id="number-of-guests" class="text-xl text-gray-500"></div>
           </div>
-          
         </div>
 
         <!-- Thời gian đếm ngược -->
-        <div class="flex flex-row bg-white text-center w-2/5 h-[70px] border-blue-600 border rounded-xl mx-10">
-          <img src="../static/images/clock.png" class="h-10 w-10 my-4 mx-1" alt="People" />
-          <div
-            class="flex flex-col text-xs p-3"
-          >
+        <div
+          class="flex flex-row bg-white text-center w-2/5 h-[70px] border-blue-600 border rounded-xl mx-10"
+        >
+          <img
+            src="../static/images/clock.png"
+            class="h-10 w-10 my-4 mx-1"
+            alt="People"
+          />
+          <div class="flex flex-col text-xs p-3">
             <strong class="text-blue-700">Đếm ngược sự kiện</strong>
             <div id="countdown" class="text-xl text-gray-500"></div>
           </div>
-          
         </div>
       </div>
     </div>
@@ -131,7 +144,9 @@
         id="divtable"
         class="relative flex-grow overflow-x-auto sm:rounded-lg"
       >
-        <table class="w-full table-fixed text-sm text-gray-500 border border-gray-400">
+        <table
+          class="w-full table-fixed text-sm text-gray-500 border border-gray-400"
+        >
           <thead class="text-xs text-black text-center uppercase bg-[#bec2c7]">
             <tr>
               <th scope="col" class="px-4 py-2 w-1/12 h-10">STT</th>
@@ -157,8 +172,10 @@
         id="hidden-popup"
         style="transform: translate(-50%, -50%)"
       >
-        <div id="popup-content" class="flex flex-col text-black text-xl/7 py-4">
-        </div>
+        <div
+          id="popup-content"
+          class="flex flex-col text-black text-xl/7 py-4"
+        ></div>
         <button
           id="close-popup"
           class="absolute top-2 right-2 bg-red-500 text-white rounded-full aspect-square w-6"

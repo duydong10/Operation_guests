@@ -82,3 +82,21 @@ export function set_startTime() {
       });
   });
 }
+
+export function get_startTime() {
+  fetchGetStartTime()
+    .then((data) => {
+      const hours = document.getElementById("hours");
+      const minutes = document.getElementById("minutes");
+      const seconds = document.getElementById("seconds");
+
+      if (hours && minutes && seconds) {
+        hours.value = data.hours;
+        minutes.value = data.minutes;
+        seconds.value = data.seconds;
+      }
+    })
+    .catch((err) => {
+      console.error("Lỗi lấy thời gian bắt đầu:", err);
+    });
+}

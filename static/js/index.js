@@ -118,7 +118,7 @@ window.addEventListener("DOMContentLoaded", function () {
 
   // window.addEventListener("resize", calculateRowsPerPage);
 
-  const evtSource = new EventSource("/guests/stream");
+  const evtSource = new EventSource("/stream/guests");
   evtSource.onmessage = function () {
     updateGuestCount();
     updateGuestData();
@@ -128,4 +128,9 @@ window.addEventListener("DOMContentLoaded", function () {
   evtSource.onerror = function (err) {
     console.error("SSE lỗi:", err);
   };
+
+  const evtLastGuest = new EventSource("/stream/last_guest");
+  evtLastGuest.onmessage = function () {
+
+  }
 });

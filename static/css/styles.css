@@ -1,0 +1,17 @@
+@font-face {
+  font-family: 'Inter';
+  src: url('.../fonts/static/Inter_18pt-Regular.ttf') format('ttf');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url('.../fonts/static/Inter_18pt-Bold.ttf') format('ttf');
+  font-weight: 700;
+  font-style: normal;
+}
+
+.menu-btn:hover {
+  color: rgb(0, 102, 255);
+}
