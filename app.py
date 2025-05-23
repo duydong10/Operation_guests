@@ -12,6 +12,8 @@ from datetime import datetime, timezone
 import socket
 import json
 from collections import deque
+from function.sse_service import event_stream
+from function.updateEnv import update_config_env
 
 app = Flask(__name__, static_folder="static")
 CORS(app)
@@ -95,25 +97,7 @@ def listen_to_changes_pool():
 #SSE danh sách khách mời
 @app.route("/stream/guests")
 def stream_guests():
-    def event_stream():
-        last_data = None
-        while True:
-            try:
-                # Lấy số lượng hoặc timestamp mới nhất làm điều kiện thay đổi
-                guests = list(collection_guests.find({}, {"_id": 0}))
-                current_data = str(guests)
-
-                if current_data != last_data:
-                    last_data = current_data
-                    yield f"data: {current_data}\n\n"
-
-                time.sleep(delay)
-            except GeneratorExit:
-                break
-            except Exception as e:
-                print("Lỗi trong SSE:", e)
-                break
-
+    event_stream()
     return Response(stream_with_context(event_stream()), mimetype="text/event-stream")
 
 
@@ -368,35 +352,6 @@ def get_starttime():
         return jsonify(starttime), 200
     except Exception as e:
         return jsonify({"message": f"Lỗi: {e}"}), 500
-
-# Cap nhat config.env theo cac dong dict
-def update_config_env(updates: dict, config_path="config.env"):
-    if os.path.exists(config_path):
-        with open(config_path, "r") as f:
-            lines = f.readlines()
-    else:
-        lines = []
-
-    new_lines = []
-    found_keys = {key: False for key in updates}
-
-    for line in lines:
-        updated = False
-        for key, value in updates.items():
-            if line.startswith(f"{key}="):
-                new_lines.append(f"{key}={value}\n")
-                found_keys[key] = True
-                updated = True
-                break
-        if not updated:
-            new_lines.append(line)
-
-    for key, value in updates.items():
-        if not found_keys[key]:
-            new_lines.append(f"{key}={value}\n")
-
-    with open(config_path, "w") as f:
-        f.writelines(new_lines)
 
 # Thiet lap TCP client config
 @app.route("/api/set_tcpclient", methods=["POST"])
