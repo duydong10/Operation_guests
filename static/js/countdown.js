@@ -7,19 +7,18 @@ let startTime = null;
  */
 export async function initCountdown() {
   try {
-    // Gọi API để lấy thời gian bắt đầu chỉ một lần
     const res = await fetchGetStartTime();
     startTime = res;
 
-    countdown(); // Hiển thị ngay lần đầu
-    setInterval(countdown, 1000); // Cập nhật mỗi giây
+    countdown();
+    setInterval(countdown, 1000);
   } catch (err) {
     console.error("Không thể lấy thời gian bắt đầu:", err);
   }
 }
 
 /**
- * Hàm đếm ngược, dùng thời gian đã được lưu từ initCountdown()
+ * Hàm đếm ngược thời gian bắt đầu
  */
 function countdown() {
   if (!startTime) return;
@@ -57,7 +56,7 @@ function countdown() {
 }
 
 /**
- * Hàm xử lý form cập nhật thời gian trên trang setting
+ * Hàm xử lý form cập nhật thời gian
  */
 export function set_startTime() {
   const form = document.getElementById("timeForm");
@@ -83,6 +82,7 @@ export function set_startTime() {
   });
 }
 
+//* Hàm lấy thời gian bắt đầu hiển thị cho form */
 export function get_startTime() {
   fetchGetStartTime()
     .then((data) => {

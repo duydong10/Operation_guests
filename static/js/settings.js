@@ -1,4 +1,7 @@
 // settings.js
+// for setting.html
+//-------------------------------------------------------------
+
 import { set_startTime, get_startTime } from "./countdown.js";
 import {
   fetchPostTCP,
@@ -17,6 +20,7 @@ const settcp_btn = document.getElementById("settcp-btn");
 const setminio_btn = document.getElementById("setminio-btn");
 const options_content = document.getElementById("options");
 
+// Chức năng cài đặt TCP client RFID
 settcp_btn.onclick = () => {
   options_content.innerHTML = `
     <p
@@ -98,6 +102,7 @@ export function set_tcp() {
   });
 }
 
+// Chức năng cài đặt thời gian bắt đầu sự kiện
 settime_btn.onclick = () => {
   options_content.innerHTML = `
     <p
@@ -153,6 +158,7 @@ settime_btn.onclick = () => {
   set_startTime();
 };
 
+// Chức năng cài đặt MinIO Server
 setminio_btn.onclick = () => {
   options_content.innerHTML = `
     <p

@@ -1,3 +1,7 @@
+// index.js
+// for index.html
+//-------------------------------------------------------------
+
 import {
   fetchGetLastGuest,
   fetchGetGuestCount,
@@ -103,12 +107,12 @@ function calculateRowsPerPage() {
 }
 
 window.addEventListener("DOMContentLoaded", function () {
-  // const tbody = document.getElementById("tbody-guests");
+  
 
   // calculateRowsPerPage();
   updateGuestCount();
   updateGuestData();
-
+  // const tbody = document.getElementById("tbody-guests");
   // if (tbody) {
   //   const resizeObserver = new ResizeObserver(() => {
   //     calculateRowsPerPage();

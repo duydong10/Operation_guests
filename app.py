@@ -92,7 +92,7 @@ def listen_to_changes_pool():
     except Exception as e:
         print("Lỗi khi lắng nghe pool:", e)
 
-
+#SSE danh sách khách mời
 @app.route("/stream/guests")
 def stream_guests():
     def event_stream():
@@ -182,7 +182,7 @@ def start_tcp_client():
             print(f"Lỗi TCP client: {e}")
             time.sleep(0.1)
 
-
+#Cập nhật khách qua cửa
 def update_status():
     global tcp_queue, last_guest, delay
     guests = data_guests.copy()

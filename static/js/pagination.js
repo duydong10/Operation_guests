@@ -1,3 +1,7 @@
+//pagination.js
+//Render thanh điều hướng trang của bảng khách mời
+//----------------------------------------------------
+
 export function renderPagination(
   guestsData,
   currentPage,

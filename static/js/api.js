@@ -1,3 +1,7 @@
+// api.js
+// fetch APIs
+//-------------------------------------------------------------
+
 export async function fetchGetLastGuest() {
   const res = await fetch("/api/get_last_guest", { method: "GET" });
   return await res.json();

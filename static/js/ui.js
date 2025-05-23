@@ -1,3 +1,8 @@
+//ui.js
+//Giao diện hệ thống cho index.html
+//----------------------------------------------------------------
+
+// Hiển thị thông tin khách qua cửa
 export function showGuestInfo(data, url, code) {
   document.getElementById("guest-image").innerHTML = `
   <div class="">
@@ -21,12 +26,14 @@ export function showGuestInfo(data, url, code) {
   document.getElementById("guest-checkin").style.display = "inline";
 }
 
+//Hiển thị số lượng khách check-in
 export function showGuestCount(count) {
   document.getElementById("number-of-guests").innerHTML = `
       ${count}
     `;
 }
 
+//Hiển thị bảng danh sách khách mời
 export function renderGuestTable(guestsData, currentPage, rowsPerPage) {
   const tbody = document.getElementById("tbody-guests");
   tbody.innerHTML = "";
@@ -61,6 +68,7 @@ export function renderGuestTable(guestsData, currentPage, rowsPerPage) {
   });
 }
 
+//Pop-up hiển thị thông tin khách khi nhấn vào ảnh
 export function hiddenGuestInfo(guestsData) {
   const hc = document.getElementById("hidden-container");
   const pcontent = document.getElementById("popup-content");
